@@ -1,6 +1,9 @@
-from flask import Flask, request
+from flask import Flask, request, Response
 from urllib.parse import unquote, urlparse
-from rss_lambda.lambdas import filter_by_description_excluding_substrings, filter_by_description_containing_image
+from rss_lambda.lambdas import \
+    filter_by_title_excluding_substrings,\
+    filter_by_description_excluding_substrings,\
+    filter_by_description_containing_image
 from rss_lambda.rss_lambda import RSSLambdaError
 
 app = Flask(__name__)
@@ -27,14 +30,18 @@ def rss():
 
     params = request.args.getlist('param')
     try:
-        if op == "filter_desc_excl_substrs":
+        if op == "filter_title_excl_substrs":
             if not params:
                 return "No param provided", 400
-            return filter_by_description_excluding_substrings(url, params)
+            return Response(filter_by_title_excluding_substrings(url, params), mimetype='application/xml')
+        elif op == "filter_desc_excl_substrs":
+            if not params:
+                return "No param provided", 400
+            return Response(filter_by_description_excluding_substrings(url, params), mimetype='application/xml')
         elif op == "filter_desc_cont_img":
             if params:
                 return "No param expected", 400
-            return filter_by_description_containing_image(url)
+            return Response(filter_by_description_containing_image(url), mimetype='application/rss+xml')
         else:
             return f"Unknown op {op}", 400
     except RSSLambdaError as e:

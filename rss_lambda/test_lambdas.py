@@ -1,16 +1,15 @@
 import unittest
 import responses
 from typing import List
-from datetime import datetime, timezone
-from .lambdas import filter_by_description_excluding_substrings, filter_by_description_containing_image
+from .lambdas import filter_by_title_excluding_substrings, filter_by_description_excluding_substrings, filter_by_description_containing_image
 
-def _response(description_htmls: List[str]):
+def _nitter_rss20_response(description_htmls: List[str]):
     def description_html_to_xml(description_html: str) -> str:
         return f"""<item>
     <title>title</title>
     <dc:creator>@twitter_handle</dc:creator>
     <description><![CDATA[{description_html}]]></description>
-    <pubDate>{datetime.now(timezone.utc).strftime("%a, %d %b %Y %H:%M:%S GMT")}</pubDate>
+    <pubDate>{"Sat, 06 Jan 2024 07:06:54 GMT"}</pubDate>
     <guid>http://nitter.example.com/twitter_handle/status/-1#m</guid>
     <link>http://nitter.example.com/twitter_handle/status/-1#m</link>
 </item>"""
@@ -29,42 +28,98 @@ def _response(description_htmls: List[str]):
 </channel>
 </rss>"""
 
+def _youtube_atom_response(titles: List[str]):
+    def title_to_xml(title: str) -> str:
+        return f"""<entry>
+  <id>yt:video:bbbbbb</id>
+  <yt:videoId>bbbbbb</yt:videoId>
+  <yt:channelId>aaaaaa</yt:channelId>
+  <title>{title}</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=bbbbbb"/>
+  <author>
+   <name>channel title</name>
+   <uri>https://www.youtube.com/channel/aaaaaa</uri>
+  </author>
+  <published>{'2024-01-06T07:07:14+0000'}</published>
+  <updated>{'2024-01-06T07:07:14+0000'}</updated>
+  <media:group>
+   <media:title>{title}</media:title>
+   <media:content url="https://www.youtube.com/v/bbbbbb?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/bbbbbb/hqdefault.jpg" width="480" height="360"/>
+   <media:description>description</media:description>
+   <media:community>
+    <media:starRating count="114514" average="5.00" min="1" max="5"/>
+    <media:statistics views="114514"/>
+   </media:community>
+  </media:group>
+ </entry>"""
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=aaaaaa"/>
+ <id>yt:channel:aaaaaa</id>
+ <yt:channelId>aaaaaa</yt:channelId>
+ <title>channel title</title>
+ <link rel="alternate" href="https://www.youtube.com/channel/aaaaaa"/>
+ <author>
+  <name>channel title</name>
+  <uri>https://www.youtube.com/channel/aaaaaa</uri>
+ </author>
+ <published>{'2024-01-06T07:07:14+0000'}</published>
+ {'\n'.join(map(title_to_xml, titles))}
+</feed>"""
+
+fake_nitter_url = "https://nitter.example.com/twitter_handle/rss"
+fake_youtube_url = "https://www.youtube.com/feeds/videos.xml?channel_id=aaaaaa"
 
 class LambdasTestCase(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
 
-    def _add_response(self, body):
+    def _add_response(self, url, body):
         responses.add(
             responses.GET,
-            'https://nitter.example.com/twitter_handle/rss',
+            url,
             status=200,
             content_type='application/rss+xml',
             body=body
         )
 
     @responses.activate
+    def test_filter_by_title_excluding_substrings(self):
+        self._add_response(fake_youtube_url, _youtube_atom_response([
+            'title 1',
+            'title 2 but EXCLUDE ME',
+        ]))
+        self.assertEqual(
+            filter_by_title_excluding_substrings(fake_youtube_url, ['EXCLUDE ME']),
+            _youtube_atom_response([
+                'title 1',
+            ])
+        )
+
+    @responses.activate
     def test_filter_by_description_excluding_substrings(self):
-        self._add_response(_response([
+        self._add_response(fake_nitter_url, _nitter_rss20_response([
             '<p>some random text</p>',
             '<p>also some random texts but EXCLUDE ME hahaha</p>',
         ]))
         self.assertEqual(
-            filter_by_description_excluding_substrings('https://nitter.example.com/twitter_handle/rss', ['EXCLUDE ME']),
-            _response([
+            filter_by_description_excluding_substrings(fake_nitter_url, ['EXCLUDE ME']),
+            _nitter_rss20_response([
                 '<p>some random text</p>',
             ])
         )
 
     @responses.activate
     def test_filter_by_description_containing_image(self):
-        self._add_response(_response([
+        self._add_response(fake_nitter_url, _nitter_rss20_response([
             '<p>some random text</p>',
             '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic.jpg" />',
         ]))
         self.assertEqual(
-            filter_by_description_containing_image('https://nitter.example.com/twitter_handle/rss'),
-            _response([
+            filter_by_description_containing_image(fake_nitter_url),
+            _nitter_rss20_response([
                 '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic.jpg" />',
             ])
         )

@@ -1,6 +1,6 @@
 import requests
 import feedparser
-from typing import Callable, Optional
+from typing import Callable, Optional, Dict
 from lxml import etree
 
 
@@ -14,7 +14,7 @@ xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
 
 def rss_lambda(
         rss_url: str,
-        rss_item_lambda: Callable[[etree.Element], Optional[etree.Element]]
+        rss_item_lambda: Callable[[etree.Element, Dict], Optional[etree.Element]]
 ) -> str:
     # Download the feed
     try:
@@ -42,7 +42,7 @@ def rss_lambda(
         raise RSSLambdaError(f"Escaped unsupported feed version: {feed.version}")
 
     # Filter the items or entries
-    transformed_items = list(map(rss_item_lambda, items))
+    transformed_items = list(map(lambda item: rss_item_lambda(item, root.nsmap), items))
 
     # Remove all original items and appended kept items
     for item in items:
