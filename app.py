@@ -1,6 +1,6 @@
 from flask import Flask, request
 from urllib.parse import unquote, urlparse
-from rss_lambda.lambdas import filter_by_description_excluding_substring, filter_by_description_containing_image
+from rss_lambda.lambdas import filter_by_description_excluding_substrings, filter_by_description_containing_image
 from rss_lambda.rss_lambda import RSSLambdaError
 
 app = Flask(__name__)
@@ -25,14 +25,14 @@ def rss():
     if not op:
         return "No op provided", 400
 
-    param = request.args.get('param', default=None)
+    params = request.args.getlist('param')
     try:
-        if op == "filter_desc_excl_substr":
-            if not param:
+        if op == "filter_desc_excl_substrs":
+            if not params:
                 return "No param provided", 400
-            return filter_by_description_excluding_substring(url, param)
+            return filter_by_description_excluding_substrings(url, params)
         elif op == "filter_desc_cont_img":
-            if param:
+            if params:
                 return "No param expected", 400
             return filter_by_description_containing_image(url)
         else:

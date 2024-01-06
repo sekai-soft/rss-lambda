@@ -2,7 +2,7 @@ import unittest
 import responses
 from typing import List
 from datetime import datetime, timezone
-from .lambdas import filter_by_description_excluding_substring, filter_by_description_containing_image
+from .lambdas import filter_by_description_excluding_substrings, filter_by_description_containing_image
 
 def _response(description_htmls: List[str]):
     def description_html_to_xml(description_html: str) -> str:
@@ -44,13 +44,13 @@ class LambdasTestCase(unittest.TestCase):
         )
 
     @responses.activate
-    def test_filter_by_description_excluding_substring(self):
+    def test_filter_by_description_excluding_substrings(self):
         self._add_response(_response([
             '<p>some random text</p>',
             '<p>also some random texts but EXCLUDE ME hahaha</p>',
         ]))
         self.assertEqual(
-            filter_by_description_excluding_substring('https://nitter.example.com/twitter_handle/rss', 'EXCLUDE ME'),
+            filter_by_description_excluding_substrings('https://nitter.example.com/twitter_handle/rss', ['EXCLUDE ME']),
             _response([
                 '<p>some random text</p>',
             ])
