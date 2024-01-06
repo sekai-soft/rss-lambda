@@ -32,8 +32,6 @@ def rss_lambda(
     # Parse the feed and find the parent element of the items or entries
     lxml_parser = etree.XMLParser(strip_cdata=False)
     root = etree.fromstring(res.text.encode('utf-8'), parser=lxml_parser)
-    etree.register_namespace('atom', 'http://www.w3.org/2005/Atom')
-    etree.register_namespace('dc', 'http://purl.org/dc/elements/1.1/')
     if feed.version == 'rss20':
         parent = root.find('./channel')
         items = parent.findall('item')
@@ -54,7 +52,6 @@ def rss_lambda(
             parent.append(item)
 
     # Return the filtered feed
-    xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
     if xml_declaration in res.text:
         return xml_declaration + '\n' + etree.tostring(root, encoding='unicode')
     else:
