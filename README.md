@@ -14,6 +14,12 @@ You need to urlencode the url first, using tools like [urlencoder.org](https://w
 https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss
 ```
 
+### Filter a rss feed by including entries with certain keywords in their titles
+Your filtered feed url will be this if you want to only include entries with `keyword1` and `keyword2` in their titles
+```
+https://rss-lambda.ktachibana.party/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_title_incl_substrs&param=keyword1&param=keyword2
+```
+
 ### Filter a rss feed by excluding entries with certain keywords in their titles
 Your filtered feed url will be this if you want to exclude entries with `keyword1` and `keyword2` in their titles
 ```
