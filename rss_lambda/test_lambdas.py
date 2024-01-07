@@ -1,7 +1,11 @@
 import unittest
 import responses
 from typing import List
-from .lambdas import filter_by_title_excluding_substrings, filter_by_description_excluding_substrings, filter_by_description_containing_image
+from .lambdas import \
+    filter_by_title_including_substrings,\
+    filter_by_title_excluding_substrings,\
+    filter_by_description_excluding_substrings,\
+    filter_by_description_containing_image
 
 def _nitter_rss20_response(description_htmls: List[str]):
     def description_html_to_xml(description_html: str) -> str:
@@ -83,6 +87,19 @@ class LambdasTestCase(unittest.TestCase):
             status=200,
             content_type='application/rss+xml',
             body=body
+        )
+
+    @responses.activate
+    def test_filter_by_title_including_substrings(self):
+        self._add_response(fake_youtube_url, _youtube_atom_response([
+            'title 1',
+            'title 2 but INCLUDE ME',
+        ]))
+        self.assertEqual(
+            filter_by_title_including_substrings(fake_youtube_url, ['INCLUDE ME']),
+            _youtube_atom_response([
+                'title 2 but INCLUDE ME',
+            ])
         )
 
     @responses.activate

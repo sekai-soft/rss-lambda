@@ -1,10 +1,13 @@
 from flask import Flask, request, Response
 from urllib.parse import unquote, urlparse
 from rss_lambda.lambdas import \
+    filter_by_title_including_substrings,\
     filter_by_title_excluding_substrings,\
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
 from rss_lambda.rss_lambda import RSSLambdaError
+
+max_params = 50
 
 app = Flask(__name__)
 
@@ -29,8 +32,14 @@ def rss():
         return "No op provided", 400
 
     params = request.args.getlist('param')
+    if len(params) > max_params:
+        return f"Too many params, max {max_params} params allowed", 400
     try:
-        if op == "filter_title_excl_substrs":
+        if op == "filter_title_incl_substrs":
+            if not params:
+                return "No param provided", 400
+            return Response(filter_by_title_including_substrings(url, params), mimetype='application/xml')
+        elif op == "filter_title_excl_substrs":
             if not params:
                 return "No param provided", 400
             return Response(filter_by_title_excluding_substrings(url, params), mimetype='application/xml')
