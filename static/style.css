@@ -1,0 +1,129 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    background: #1A1A1A;
+    color: #F5F5F5;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.code-font {
+    font-family: 'Courier New', monospace;
+}
+
+p {
+    font-size: 2em;
+    line-height: 1.5;
+}
+
+input {
+    font-size: 2em;
+    line-height: 1.5;
+}
+
+select {
+    font-size: 1em;
+}
+
+.tag {
+    font-size: 2em;
+    margin-bottom: 0.5em;
+}
+
+a {
+    font-size: 2em;
+    line-height: 1.5;
+}
+
+/** font sizes for tablet **/
+@media screen and (max-width: 768px) {
+    p {
+        font-size: 2em;
+        line-height: 1.5;
+    }
+
+    input {
+        font-size: 2em;
+        line-height: 1.5;
+    }
+
+    .tag {
+        font-size: 2em;
+    }
+
+    a {
+        font-size: 2em;
+        line-height: 1.5;
+    }
+}
+
+/** font sizes for phone **/
+@media screen and (max-width: 414px) {
+    p {
+        font-size: 1.5em;
+        line-height: 1.5;
+    }
+
+    input {
+        font-size: 1.5em;
+        line-height: 1.5;
+    }
+
+    .tag {
+        font-size: 1.5em;
+    }
+
+    a {
+        font-size: 1.5em;
+        line-height: 1.5;
+    }
+}
+
+input {
+    color: #F5F5F5;
+    border: none;
+    border-bottom: 2px solid #999999;
+    background-color: #1A1A1A;
+    width: 75%;
+}
+
+.short-input {
+    width: 25%;
+}
+
+input::placeholder {
+    color: #999999;
+}
+
+input:focus {
+    outline: none;
+}
+
+select {
+    color: #F5F5F5;
+    border: none;
+    background-color: #1A1A1A;
+    max-width: 75%;
+}
+
+select:focus {
+    outline: none;
+}
+
+.tag {
+    color: #F5F5F5;
+    background-color: #1A1A1A;
+    border: 2px solid #F5F5F5;
+    border-radius: 8px;
+    padding: 0.5em;
+    margin-right: 0.5em;
+    display: inline-block;
+    cursor: pointer;
+}
+
+a {
+    color: #F5F5F5;
+}
+
+.long-url {
+    overflow-wrap: anywhere;
+}

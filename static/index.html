@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>RSS-lambda</title>
+    <meta name="description" content="RSS-lambda is a webapp that performs operations on RSS feeds.">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="//unpkg.com/alpinejs" defer></script>
+  </head>
+  <body
+    x-data="{
+      feedUrl: '',
+      isValidUrl: false,
+      op: 'null',
+      params: ['text'],
+      newParam: '',
+      resUrl: ''
+    }"
+    x-init="() => {
+      // updates isValidUrl
+      $watch(
+        'feedUrl',
+        () => {
+          try {
+            new URL(feedUrl); isValidUrl = true;
+          } catch (_) {
+            isValidUrl = feedUrl == 't';
+          }
+        }
+      );
+
+      // updates resUrl
+      $watch(
+        'feedUrl, op, params',
+        () => {
+          if (!isValidUrl) return;
+          const urlObj = new URL(window.location.protocol + '//' + window.location.host + '/rss');
+          if (op == 'null') {
+            resUrl = '';
+          } else if (op == 'filter_desc_cont_img') {
+            urlObj.searchParams.append('url', encodeURI(feedUrl));
+            urlObj.searchParams.append('op', op);
+            resUrl = urlObj.href;
+          } else {
+            urlObj.searchParams.append('url', encodeURI(feedUrl));
+            urlObj.searchParams.append('op', op);
+            for (const param of params) {
+              urlObj.searchParams.append('params', param);
+            }
+            resUrl = urlObj.href;
+          }
+        }
+      );
+    }"
+  >
+    <p>RSS-lambda is a webapp that performs operations on RSS feeds.</p>
+    <p>1. Enter feed URL</p>
+    <input
+      type="text"
+      placeholder="https://example.com/rss"
+      x-model="feedUrl"
+      class="code-font"
+    >
+    <p x-show="isValidUrl">2.
+      <select x-model="op">
+        <option value="null">
+          Select an operation
+        </option>
+        <option value="filter_title_incl_substrs">
+          Title should include
+        </option>
+        <option value="filter_title_excl_substrs">
+          Title should exclude
+        </option>
+        <option value="filter_desc_excl_substrs">
+          Description should exclude
+        </option>
+        <option value="filter_desc_cont_img">
+          Description should contain image
+        </option>
+      </select>
+    </p>
+    <template x-for="param in params">
+      <div
+        class="tag"
+        x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img'"
+        @click="if (params.length == 1) return; params = params.filter(item => item !== param)"
+        x-text="param + ' ⌫'">
+      </div>
+    </template>
+    <br x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img'">
+    <input
+      type="text"
+      placeholder="string"
+      x-model="newParam"
+      x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img' && params.length < 50"
+      class="short-input"
+      @keydown.enter="if (!newParam || params.includes(newParam)) return; params = [...params, newParam]; newParam = ''"
+    >
+    <p x-show="isValidUrl && resUrl">3. This is the modified feed URL</p>
+    <a
+      x-show="isValidUrl && resUrl"
+      x-text="resUrl"
+      class="code-font long-url"
+      x-bind:href="resUrl"
+      target="_blank"
+    ></a>
+    <div style="height: 1.5em"></div>
+    <div
+      x-show="isValidUrl && resUrl"
+      x-data="{ copied: false }"
+      x-text="copied ? 'Copied to clipboard' : 'Copy to clipboard'"
+      class="tag"
+      @click="navigator.clipboard.writeText(resUrl); copied = true; setTimeout(() => copied = false, 3000)"
+    ></div>
+    <div
+      x-show="isValidUrl && resUrl"
+      class="tag"
+      @click="window.open('https://www.inoreader.com/?add_feed=' + encodeURI(resUrl), '_blank')"
+    >Open in Inoreader</div>
+  </body>
+</html>

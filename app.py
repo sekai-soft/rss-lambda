@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, send_from_directory
 from urllib.parse import unquote, urlparse
 from rss_lambda.lambdas import \
     filter_by_title_including_substrings,\
@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "index"
+    return send_from_directory('static', 'index.html')
 
 @app.route("/rss")
 def rss():

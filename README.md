@@ -1,5 +1,5 @@
-# rss-lambda
-Perform lambda on your rss feeds
+# RSS-lambda
+RSS-lambda is a webapp that performs operations on RSS feeds.
 
 ## Usage
 You need to urlencode your feed url first
