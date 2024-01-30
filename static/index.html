@@ -124,7 +124,7 @@
       <div
         x-show="isValidUrl && resUrl"
         class="tag"
-        @click="window.open('https://www.inoreader.com/?add_feed=' + encodeURI(resUrl), '_blank')"
+        @click="window.open('https://www.inoreader.com/?add_feed=' + encodeURIComponent(resUrl), '_blank')"
       >Open in Inoreader</div>
     </div>
     <div class="centered-container">
