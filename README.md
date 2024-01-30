@@ -52,3 +52,14 @@ services:
 ```
 
 The program will be exposed at port 5000 and you can then use a reverse proxy like Nginx to expose it to the Internet
+
+## Development
+
+Open in VSCode, then run
+
+```bash
+pip install -r requirements.txt
+flask run --reload
+```
+
+The webapp will be available at [localhost:5000](http://localhost:5000)
