@@ -105,7 +105,7 @@
         class="short-input"
         @keydown.enter="if (!newParam || params.includes(newParam)) return; params = [...params, newParam]; newParam = ''"
       >
-      <p x-show="isValidUrl && resUrl">3. This is the feed URL after operatoin</p>
+      <p x-show="isValidUrl && resUrl">3. This is the feed URL after operation</p>
       <a
         x-show="isValidUrl && resUrl"
         x-text="resUrl"

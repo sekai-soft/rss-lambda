@@ -2,7 +2,19 @@
 RSS-lambda is a webapp that performs operations on RSS feeds.
 
 ## Usage
-You need to urlencode your feed url first
+
+### Web UI
+
+There is a web UI available at [rss-lambda.ktachibana.party](https://rss-lambda.ktachibana.party)
+
+From there, you can input what you want to do with the RSS feed,
+and the webapp will generate a feed URL after your specified operation.
+
+### Manual
+
+You could also construct the after-operation feed URL manually.
+
+You need to urlencode your feed url first.
 
 For example, if your feed url is
 ```
