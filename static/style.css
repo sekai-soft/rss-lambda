@@ -6,6 +6,17 @@ body {
     margin-right: 1rem;
 }
 
+/* Hide scrollbar for Chrome, Safari, and Opera */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Firefox */
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
 .fullscreen {
     height: 100vh;
 }
