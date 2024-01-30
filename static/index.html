@@ -47,7 +47,7 @@
             urlObj.searchParams.append('url', encodeURI(feedUrl));
             urlObj.searchParams.append('op', op);
             for (const param of params) {
-              urlObj.searchParams.append('params', param);
+              urlObj.searchParams.append('param', param);
             }
             resUrl = urlObj.href;
           }
@@ -99,7 +99,7 @@
       class="short-input"
       @keydown.enter="if (!newParam || params.includes(newParam)) return; params = [...params, newParam]; newParam = ''"
     >
-    <p x-show="isValidUrl && resUrl">3. This is the modified feed URL</p>
+    <p x-show="isValidUrl && resUrl">3. This is the feed URL after operatoin</p>
     <a
       x-show="isValidUrl && resUrl"
       x-text="resUrl"
