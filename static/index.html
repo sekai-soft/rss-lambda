@@ -19,7 +19,7 @@
       feedUrl: '',
       isValidUrl: false,
       op: 'null',
-      params: ['text'],
+      params: ['Keyword1'],
       newParam: '',
       resUrl: ''
     }"
@@ -98,7 +98,7 @@
     <br x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img'">
     <input
       type="text"
-      placeholder="string"
+      placeholder="Keyword"
       x-model="newParam"
       x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img' && params.length < 50"
       class="short-input"
