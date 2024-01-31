@@ -15,8 +15,8 @@ def _filter_by_title_including_substrings(e: etree.Element, root_nsmap: Dict, in
             return e
     return None
 
-def filter_by_title_including_substrings(rss_url: str, included_substrings: List[str]) -> str:
-    return rss_lambda(rss_url, lambda e, root_nsmap: _filter_by_title_including_substrings(e, root_nsmap, included_substrings))
+def filter_by_title_including_substrings(rss_text: str, included_substrings: List[str]) -> str:
+    return rss_lambda(rss_text, lambda e, root_nsmap: _filter_by_title_including_substrings(e, root_nsmap, included_substrings))
 
 def _filter_by_title_excluding_substrings(e: etree.Element, root_nsmap: Dict, excluded_substrings: List[str]) -> Optional[etree.Element]:
     title_e = e.find('title', root_nsmap)
@@ -28,8 +28,8 @@ def _filter_by_title_excluding_substrings(e: etree.Element, root_nsmap: Dict, ex
             return None
     return e
 
-def filter_by_title_excluding_substrings(rss_url: str, excluded_substrings: List[str]) -> str:
-    return rss_lambda(rss_url, lambda e, root_nsmap: _filter_by_title_excluding_substrings(e, root_nsmap, excluded_substrings))
+def filter_by_title_excluding_substrings(rss_text: str, excluded_substrings: List[str]) -> str:
+    return rss_lambda(rss_text, lambda e, root_nsmap: _filter_by_title_excluding_substrings(e, root_nsmap, excluded_substrings))
 
 def _filter_by_description_excluding_substrings(e: etree.Element, root_nsmap: Dict, excluded_substrings: List[str]) -> Optional[etree.Element]:
     description_e = e.find('description', root_nsmap)
@@ -41,8 +41,8 @@ def _filter_by_description_excluding_substrings(e: etree.Element, root_nsmap: Di
             return None
     return e
 
-def filter_by_description_excluding_substrings(rss_url: str, excluded_substrings: List[str]) -> str:
-    return rss_lambda(rss_url, lambda e, root_nsmap: _filter_by_description_excluding_substrings(e, root_nsmap, excluded_substrings))
+def filter_by_description_excluding_substrings(rss_text: str, excluded_substrings: List[str]) -> str:
+    return rss_lambda(rss_text, lambda e, root_nsmap: _filter_by_description_excluding_substrings(e, root_nsmap, excluded_substrings))
 
 def _filter_by_description_containing_image(e: etree.Element, root_nsmap: Dict) -> Optional[etree.Element]:
     description_e = e.find('description', root_nsmap)
@@ -54,5 +54,5 @@ def _filter_by_description_containing_image(e: etree.Element, root_nsmap: Dict) 
     except etree.ParseError:
         return e
 
-def filter_by_description_containing_image(rss_url: str) -> str:
-    return rss_lambda(rss_url, _filter_by_description_containing_image)
+def filter_by_description_containing_image(rss_text: str) -> str:
+    return rss_lambda(rss_text, _filter_by_description_containing_image)

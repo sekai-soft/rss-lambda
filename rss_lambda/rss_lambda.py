@@ -13,17 +13,11 @@ supported_feed_versions = ["rss20", "atom10", "atom03"]
 xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'
 
 def rss_lambda(
-        rss_url: str,
+        rss_text: str,
         rss_item_lambda: Callable[[etree.Element, Dict], Optional[etree.Element]]
-) -> str:
-    # Download the feed
-    try:
-        res = requests.get(rss_url)
-    except Exception as _:
-        raise RSSLambdaError(f"Failed to download the feed")
-    
+) -> str: 
     # Determine if it's a valid and supported feed
-    feed = feedparser.parse(res.text)
+    feed = feedparser.parse(rss_text)
     if feed.bozo != 0:
         raise RSSLambdaError(f"Failed to parse the feed")
     if feed.version not in supported_feed_versions:
@@ -31,7 +25,7 @@ def rss_lambda(
 
     # Parse the feed and find the parent element of the items or entries
     lxml_parser = etree.XMLParser(strip_cdata=False)
-    root = etree.fromstring(res.text.encode('utf-8'), parser=lxml_parser)
+    root = etree.fromstring(rss_text.encode('utf-8'), parser=lxml_parser)
     if feed.version == 'rss20':
         parent = root.find('./channel')
         items = parent.findall('item')
@@ -52,7 +46,7 @@ def rss_lambda(
             parent.append(item)
 
     # Return the filtered feed
-    if xml_declaration in res.text:
+    if xml_declaration in rss_text:
         return xml_declaration + '\n' + etree.tostring(root, encoding='unicode')
     else:
         return etree.tostring(root, encoding='unicode')

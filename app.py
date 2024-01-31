@@ -1,3 +1,5 @@
+import requests
+from typing import Union
 from flask import Flask, request, Response, send_from_directory
 from urllib.parse import unquote, urlparse
 from rss_lambda.lambdas import \
@@ -14,6 +16,19 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return send_from_directory('static', 'index.html')
+
+
+def download_feed(rss_url: str, headers) -> Union[str, Response]:
+    try:
+        res = requests.get(rss_url, headers={
+            'User-Agent': headers.get('User-Agent', '')
+        })
+        if res.status_code >= 400 and res.status_code < 600:
+            return Response(res.content, res.status_code)
+        return res.text
+    except Exception as _:
+        return Response("Failed to download the feed", 500)
+
 
 @app.route("/rss")
 def rss():
@@ -38,19 +53,31 @@ def rss():
         if op == "filter_title_incl_substrs":
             if not params:
                 return "No param provided", 400
-            return Response(filter_by_title_including_substrings(url, params), mimetype='application/xml')
+            rss_text_or_res = download_feed(url, request.headers)
+            if isinstance(rss_text_or_res, str):
+                return Response(filter_by_title_including_substrings(rss_text_or_res, params), mimetype='application/xml')
+            return rss_text_or_res
         elif op == "filter_title_excl_substrs":
             if not params:
                 return "No param provided", 400
-            return Response(filter_by_title_excluding_substrings(url, params), mimetype='application/xml')
+            rss_text_or_res = download_feed(url, request.headers)
+            if isinstance(rss_text_or_res, str):
+                return Response(filter_by_title_excluding_substrings(rss_text_or_res, params), mimetype='application/xml')
+            return rss_text_or_res
         elif op == "filter_desc_excl_substrs":
             if not params:
                 return "No param provided", 400
-            return Response(filter_by_description_excluding_substrings(url, params), mimetype='application/xml')
+            rss_text_or_res = download_feed(url, request.headers)
+            if isinstance(rss_text_or_res, str):
+                return Response(filter_by_description_excluding_substrings(rss_text_or_res, params), mimetype='application/xml')
+            return rss_text_or_res
         elif op == "filter_desc_cont_img":
             if params:
                 return "No param expected", 400
-            return Response(filter_by_description_containing_image(url), mimetype='application/rss+xml')
+            rss_text_or_res = download_feed(url, request.headers)
+            if isinstance(rss_text_or_res, str):
+                return Response(filter_by_description_containing_image(rss_text_or_res, params), mimetype='application/xml')
+            return rss_text_or_res
         else:
             return f"Unknown op {op}", 400
     except RSSLambdaError as e:

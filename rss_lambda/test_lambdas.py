@@ -1,5 +1,4 @@
 import unittest
-import responses
 from typing import List
 from .lambdas import \
     filter_by_title_including_substrings,\
@@ -73,69 +72,54 @@ def _youtube_atom_response(titles: List[str]):
  {'\n'.join(map(title_to_xml, titles))}
 </feed>"""
 
-fake_nitter_url = "https://nitter.example.com/twitter_handle/rss"
-fake_youtube_url = "https://www.youtube.com/feeds/videos.xml?channel_id=aaaaaa"
 
 class LambdasTestCase(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
 
-    def _add_response(self, url, body):
-        responses.add(
-            responses.GET,
-            url,
-            status=200,
-            content_type='application/rss+xml',
-            body=body
-        )
-
-    @responses.activate
     def test_filter_by_title_including_substrings(self):
-        self._add_response(fake_youtube_url, _youtube_atom_response([
+        rss_text = _youtube_atom_response([
             'title 1',
             'title 2 but INCLUDE ME',
-        ]))
+        ])
         self.assertEqual(
-            filter_by_title_including_substrings(fake_youtube_url, ['INCLUDE ME']),
+            filter_by_title_including_substrings(rss_text, ['INCLUDE ME']),
             _youtube_atom_response([
                 'title 2 but INCLUDE ME',
             ])
         )
 
-    @responses.activate
     def test_filter_by_title_excluding_substrings(self):
-        self._add_response(fake_youtube_url, _youtube_atom_response([
+        rss_text = _youtube_atom_response([
             'title 1',
             'title 2 but EXCLUDE ME',
-        ]))
+        ])
         self.assertEqual(
-            filter_by_title_excluding_substrings(fake_youtube_url, ['EXCLUDE ME']),
+            filter_by_title_excluding_substrings(rss_text, ['EXCLUDE ME']),
             _youtube_atom_response([
                 'title 1',
             ])
         )
 
-    @responses.activate
     def test_filter_by_description_excluding_substrings(self):
-        self._add_response(fake_nitter_url, _nitter_rss20_response([
+        rss_text = _nitter_rss20_response([
             '<p>some random text</p>',
             '<p>also some random texts but EXCLUDE ME hahaha</p>',
-        ]))
+        ])
         self.assertEqual(
-            filter_by_description_excluding_substrings(fake_nitter_url, ['EXCLUDE ME']),
+            filter_by_description_excluding_substrings(rss_text, ['EXCLUDE ME']),
             _nitter_rss20_response([
                 '<p>some random text</p>',
             ])
         )
 
-    @responses.activate
     def test_filter_by_description_containing_image(self):
-        self._add_response(fake_nitter_url, _nitter_rss20_response([
+        rss_text = _nitter_rss20_response([
             '<p>some random text</p>',
             '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic.jpg" />',
-        ]))
+        ])
         self.assertEqual(
-            filter_by_description_containing_image(fake_nitter_url),
+            filter_by_description_containing_image(rss_text),
             _nitter_rss20_response([
                 '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic.jpg" />',
             ])
