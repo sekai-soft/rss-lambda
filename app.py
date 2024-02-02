@@ -76,7 +76,7 @@ def rss():
                 return "No param expected", 400
             rss_text_or_res = download_feed(url, request.headers)
             if isinstance(rss_text_or_res, str):
-                return Response(filter_by_description_containing_image(rss_text_or_res, params), mimetype='application/xml')
+                return Response(filter_by_description_containing_image(rss_text_or_res), mimetype='application/xml')
             return rss_text_or_res
         else:
             return f"Unknown op {op}", 400
