@@ -67,17 +67,13 @@ jobs:
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
           version: 1.58.2
-      - name: Add SSH key
+      - name: Add machine to known hosts
         id: ssh
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
         run: |
           mkdir -p ~/.ssh
           MACHINE_IP="$(tailscale ip -6 $TS_MACHINE)"
           ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
-          printf "%s" "$SSH_KEY" > ~/.ssh/key
-          chmod 600 ~/.ssh/key
       - name: Ssh into the machine, pull container and restart
         run: |
           MACHINE_IP="$(tailscale ip -6 $TS_MACHINE)"
-          ssh -i ~/.ssh/key "ubuntu@$MACHINE_IP" "cd $TS_DIR && docker compose pull && docker compose up -d"
+          ssh "ubuntu@$MACHINE_IP" "cd $TS_DIR && docker compose pull && docker compose up -d"
