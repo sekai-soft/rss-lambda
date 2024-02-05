@@ -1,4 +1,4 @@
-name: Test and build
+name: Test, build and deploy
 
 on:
   push:
@@ -48,10 +48,36 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push container
         uses: docker/build-push-action@v2
         with:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
           platforms: linux/amd64,linux/arm64
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push'
+    steps:
+      - name: Setup Tailscale
+        id: tailscale
+        uses: tailscale/github-action@main
+        with:
+          authkey: ${{ secrets.TS_AUTHKEY }}
+          version: 1.58.2
+      - name: Add SSH key
+        id: ssh
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          MACHINE_IP="$(tailscale ip -6 $TS_MACHINE)"
+          ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
+          printf "%s" "$SSH_KEY" > ~/.ssh/key
+          chmod 600 ~/.ssh/key
+      - name: Ssh into the machine, pull container and restart
+        run: |
+          MACHINE_IP="$(tailscale ip -6 $TS_MACHINE)"
+          ssh -i ~/.ssh/key "$TS_USERNAME@$MACHINE_IP" "cd $TS_DIR && docker compose pull && docker compose up -d"
