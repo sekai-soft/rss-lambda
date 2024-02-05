@@ -80,4 +80,4 @@ jobs:
       - name: Ssh into the machine, pull container and restart
         run: |
           MACHINE_IP="$(tailscale ip -6 $TS_MACHINE)"
-          ssh -i ~/.ssh/key "$TS_USERNAME@$MACHINE_IP" "cd $TS_DIR && docker compose pull && docker compose up -d"
+          ssh -i ~/.ssh/key "ubuntu@$MACHINE_IP" "cd $TS_DIR && docker compose pull && docker compose up -d"
