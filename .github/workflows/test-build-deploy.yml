@@ -71,9 +71,9 @@ jobs:
         id: ssh
         run: |
           mkdir -p ~/.ssh
-          MACHINE_IP="$(tailscale ip -6 $TS_MACHINE)"
+          MACHINE_IP="$(tailscale ip -4 ktcorp)"
           ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
       - name: Ssh into the machine, pull container and restart
         run: |
-          MACHINE_IP="$(tailscale ip -6 $TS_MACHINE)"
-          ssh "ubuntu@$MACHINE_IP" "cd $TS_DIR && docker compose pull && docker compose up -d"
+          MACHINE_IP="$(tailscale ip -4 ktcorp)"
+          ssh "ubuntu@$MACHINE_IP" "cd /home/ubuntu/rss-lambda && docker compose pull && docker compose up -d"
