@@ -67,13 +67,5 @@ jobs:
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
           version: 1.58.2
-      - name: Add machine to known hosts
-        id: ssh
         run: |
-          mkdir -p ~/.ssh
-          MACHINE_IP="$(tailscale ip -4 ktcorp)"
-          ssh-keyscan $MACHINE_IP >> ~/.ssh/known_hosts
-      - name: Ssh into the machine, pull container and restart
-        run: |
-          MACHINE_IP="$(tailscale ip -4 ktcorp)"
-          ssh "ubuntu@$MACHINE_IP" "cd /home/ubuntu/rss-lambda && docker compose pull && docker compose up -d"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@ktcorp" "cd /home/ubuntu/rss-lambda && docker compose pull && docker compose up -d"
