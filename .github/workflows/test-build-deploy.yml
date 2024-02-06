@@ -67,5 +67,6 @@ jobs:
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
           version: 1.58.2
+      - name: Pull and restart latest container
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@ktcorp" "cd /home/ubuntu/rss-lambda && docker compose pull && docker compose up -d"
