@@ -73,7 +73,10 @@ jobs:
 
   notify:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs:
+      - test
+      - build
+      - deploy
     if: github.event_name == 'push'
     steps:
       - name: Send a Discord notification
