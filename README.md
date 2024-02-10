@@ -59,11 +59,23 @@ services:
   app:
     restart: always
     ports:
-      - "5000:80"
+      - "5000:5000"
     image: ghcr.io/k-t-corp/rss-lambda:latest
 ```
 
 The program will be exposed at port 5000 and you can then use a reverse proxy like Nginx to expose it to the Internet
+
+Optionally you can specify the port that the program listens to. This is useful in scenarios such as [setting up a Tailscale sidecar](https://tailscale.com/blog/docker-tailscale-guide?utm_source=pocket_reader) where you need to have the program listen to port 80
+```yaml
+version: '3'
+services:
+  app:
+    restart: always
+    image: ghcr.io/k-t-corp/rss-lambda:latest
+    environment:
+      - PORT=80
+    # network_mode: service:tailscale-sidecar
+```
 
 ## Development
 

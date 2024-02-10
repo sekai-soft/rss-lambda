@@ -3,7 +3,7 @@ services:
   app:
     # restart: always
     ports:
-      - "5000:80"
+      - "5000:5000"
     # image: ghcr.io/k-t-corp/rss-lambda:latest
     build: .
   

@@ -16,4 +16,4 @@ RUN apt-get update && apt-get -y install build-essential python3-dev && pip inst
 COPY . /app
 
 # Run uwsgi.ini when the container launches
-CMD ["uwsgi", "uwsgi.ini"]
+CMD ["bash", "-c", "PORT=\"${PORT:=5000}\" && uwsgi --ini uwsgi.ini --http :${PORT}"]
