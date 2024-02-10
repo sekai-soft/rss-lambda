@@ -15,8 +15,5 @@ RUN apt-get update && apt-get -y install build-essential python3-dev && pip inst
 # Add the current directory contents into the container at /app
 COPY . /app
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
-
 # Run uwsgi.ini when the container launches
 CMD ["uwsgi", "uwsgi.ini"]
