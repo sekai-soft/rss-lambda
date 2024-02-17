@@ -50,6 +50,9 @@ Your filtered feed url will be this if you want to only include entries with ima
 https://rss-lambda.ktachibana.party/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_desc_cont_img
 ```
 
+## Like what you see?
+Consider support us on [Patreon](https://www.patreon.com/sekaisoft) :)
+
 ## Self-host
 
 You can use the following `docker-compose.yml` to run the program
