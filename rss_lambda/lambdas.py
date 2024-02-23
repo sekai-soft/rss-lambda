@@ -49,7 +49,10 @@ def _filter_by_description_containing_image(e: etree.Element, root_nsmap: Dict) 
     if description_e is None:
         return e
     try:
-        cdata = etree.fromstring(description_e.text)
+        # wrap description text in a placeholder <description> tag to parse it as a valid XML document
+        # in case the text within contains multiple root elements, e.g. <p>text1</p><p>text2</p>
+        # and thus failing to parse and mistakenly returns it as a valid entry because of etree.ParseError
+        cdata = etree.fromstring("<description>"+description_e.text+"</description>")
         return e if cdata.find('.//img') is not None else None
     except etree.ParseError:
         return e

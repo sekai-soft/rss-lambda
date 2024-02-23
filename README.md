@@ -90,3 +90,9 @@ flask run --reload
 ```
 
 The webapp will be available at [localhost:5000](http://localhost:5000)
+
+Run unit tests
+
+```bash
+python -m unittest discover
+```

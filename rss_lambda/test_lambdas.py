@@ -116,6 +116,7 @@ class LambdasTestCase(unittest.TestCase):
     def test_filter_by_description_containing_image(self):
         rss_text = _nitter_rss20_response([
             '<p>some random text</p>',
+            '<p>also some random texts</p><p>but without images haha</p>',
             '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic.jpg" />',
         ])
         self.assertEqual(
