@@ -1,5 +1,7 @@
+import logging
 from typing import Optional, List, Dict
 from lxml import etree
+from bs4 import BeautifulSoup
 from .rss_lambda import rss_lambda
 
 def is_cdata(s: str) -> bool:
@@ -49,12 +51,13 @@ def _filter_by_description_containing_image(e: etree.Element, root_nsmap: Dict) 
     if description_e is None:
         return e
     try:
-        # wrap description text in a placeholder <description> tag to parse it as a valid XML document
-        # in case the text within contains multiple root elements, e.g. <p>text1</p><p>text2</p>
-        # and thus failing to parse and mistakenly returns it as a valid entry because of etree.ParseError
-        cdata = etree.fromstring("<description>"+description_e.text+"</description>")
-        return e if cdata.find('.//img') is not None else None
-    except etree.ParseError:
+        description_text = description_e.text
+        if is_cdata(description_text):
+            description_text = description_text[9:-3]
+        soup = BeautifulSoup(description_text, 'html.parser')
+        return None if soup.find('img') is None else e
+    except Exception as ex:
+        logging.error(f'_filter_by_description_containing_image failed to parse description text: {description_e.text}, error: {ex}')
         return e
 
 def filter_by_description_containing_image(rss_text: str) -> str:

@@ -117,6 +117,7 @@ class LambdasTestCase(unittest.TestCase):
         rss_text = _nitter_rss20_response([
             '<p>some random text</p>',
             '<p>also some random texts</p><p>but without images haha</p>',
+            '<p>also some random texts<br>but without images haha 2222</p> ',
             '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic.jpg" />',
         ])
         self.assertEqual(
