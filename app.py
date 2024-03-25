@@ -1,4 +1,6 @@
+import os
 import requests
+import sentry_sdk
 from typing import Union
 from flask import Flask, request, Response, send_from_directory
 from urllib.parse import unquote, urlparse
@@ -8,6 +10,13 @@ from rss_lambda.lambdas import \
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
 from rss_lambda.rss_lambda import RSSLambdaError
+
+
+if os.getenv('SENTRY_DSN'):
+    sentry_sdk.init(
+        dsn=os.getenv('SENTRY_DSN'),
+    )
+
 
 max_params = 50
 
