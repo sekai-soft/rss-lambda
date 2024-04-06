@@ -43,9 +43,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
           platforms: linux/amd64
+          push: true
 
   build-arm:
     runs-on: buildjet-2vcpu-ubuntu-2204-arm
@@ -64,9 +63,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
-          tags: ghcr.io/${{ github.repository }}:latest
           platforms: linux/arm64
+          push: true
 
   deploy-vps:
     runs-on: ubuntu-latest
