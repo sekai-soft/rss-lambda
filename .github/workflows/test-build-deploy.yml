@@ -11,21 +11,17 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
-
+      uses: actions/checkout@v4
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.12
-
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-
     - name: Run tests
       run: |
         python -m unittest discover
@@ -36,37 +32,55 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
+        uses: actions/checkout@v4
       - name: Log in to the Github Container registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Build and push container
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
-          platforms: linux/amd64,linux/arm64
-  
+          platforms: linux/amd64
+
+  build-arm:
+    runs-on: buildjet-2vcpu-ubuntu-2204-arm
+    needs: test
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Log in to the Github Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest
+          platforms: linux/arm64
+
   deploy-vps:
     runs-on: ubuntu-latest
-    needs: build
+    needs:
+      - build
+      - build-arm
     if: github.event_name == 'push'
     steps:
       - name: Setup Tailscale
-        id: tailscale
-        uses: tailscale/github-action@main
+        uses: tailscale/github-action@v2
         with:
-          authkey: ${{ secrets.TS_AUTHKEY }}
-          version: 1.58.2
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ops
       - name: Pull and restart latest container
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@ktcorp" "cd /home/ubuntu/rss-lambda && docker compose pull && docker compose up -d"
@@ -88,6 +102,7 @@ jobs:
     needs:
       - test
       - build
+      - build-arm
       - deploy-vps
       - deploy-fly
     if: github.event_name == 'push'
