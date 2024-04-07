@@ -44,6 +44,7 @@ jobs:
         with:
           context: .
           platforms: linux/amd64
+          tags: ghcr.io/${{ github.repository }}:latest-amd64
           push: true
 
   build-arm:
@@ -64,6 +65,7 @@ jobs:
         with:
           context: .
           platforms: linux/arm64
+          tags: ghcr.io/${{ github.repository }}:latest-arm64
           push: true
 
   deploy-vps:
