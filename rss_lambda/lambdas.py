@@ -12,6 +12,8 @@ def _filter_by_title_including_substrings(e: etree.Element, root_nsmap: Dict, in
     if title_e is None:
         return e
     title = title_e.text
+    if title is None:
+        return e
     for substr in included_substrings:
         if substr in title:
             return e
