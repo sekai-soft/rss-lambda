@@ -37,6 +37,12 @@ p {
     line-height: 1.5;
 }
 
+.logo {
+    display: inline-block;
+    vertical-align: middle;
+    height: 1.25em;
+}
+
 input {
     font-size: 2em;
     line-height: 1.5;
@@ -63,6 +69,12 @@ a {
         line-height: 1.5;
     }
 
+    .logo {
+        display: inline-block;
+        vertical-align: middle;
+        height: 1.25em;
+    }
+
     input {
         font-size: 2em;
         line-height: 1.5;
@@ -83,6 +95,12 @@ a {
     p {
         font-size: 1.5em;
         line-height: 1.5;
+    }
+
+    .logo {
+        display: inline-block;
+        vertical-align: middle;
+        height: 1em;
     }
 
     input {
