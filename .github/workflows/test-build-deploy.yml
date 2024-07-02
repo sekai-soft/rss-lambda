@@ -145,7 +145,7 @@ jobs:
           tags: tag:ops
       - name: Pull and restart latest container
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@bigbadboy" "cd /boot/config/plugins/compose.manager/projects/nitter && docker compose pull && docker compose up -d"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "${{ secrets.UNRAID_SSH_USERNAME }}@${{ secrets.UNRAID_SSH_HOST }}" "cd /boot/config/plugins/compose.manager/projects/nitter && docker compose pull && docker compose up -d"
 
   notify:
     runs-on: ubuntu-latest
