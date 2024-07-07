@@ -40,7 +40,8 @@ p {
 .logo {
     display: inline-block;
     vertical-align: middle;
-    height: 1.25em;
+    height: 0.75em;
+    width: auto;
 }
 
 input {
@@ -72,7 +73,8 @@ a {
     .logo {
         display: inline-block;
         vertical-align: middle;
-        height: 1.25em;
+        height: 0.75em;
+        width: auto;
     }
 
     input {
@@ -100,7 +102,8 @@ a {
     .logo {
         display: inline-block;
         vertical-align: middle;
-        height: 1em;
+        height: 0.5em;
+        width: auto;
     }
 
     input {
