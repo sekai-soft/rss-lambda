@@ -1,12 +1,7 @@
-# fly.toml app configuration file generated for rss-lambda on 2024-03-25T08:54:02-07:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'rss-lambda'
+kill_signal = "SIGINT"
+kill_timeout = "5s"
 primary_region = 'sjc'
-
-[build]
 
 [http_service]
   internal_port = 5000

@@ -4,3 +4,4 @@ requests==2.31.0
 lxml==5.0.0
 beautifulsoup4==4.12.3
 sentry-sdk[flask]==1.43.0
+opencv-python==4.10.0.84
