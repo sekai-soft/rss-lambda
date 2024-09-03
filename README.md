@@ -63,7 +63,7 @@ services:
     restart: always
     ports:
       - "5000:5000"
-    image: ghcr.io/k-t-corp/rss-lambda:latest
+    image: ghcr.io/sekai-soft/rss-lambda:latest
 ```
 
 The program will be exposed at port 5000 and you can then use a reverse proxy like Nginx to expose it to the Internet
@@ -74,7 +74,7 @@ version: '3'
 services:
   app:
     restart: always
-    image: ghcr.io/k-t-corp/rss-lambda:latest
+    image: ghcr.io/sekai-soft/rss-lambda:latest
     environment:
       - PORT=80
     # network_mode: service:tailscale-sidecar
