@@ -16,6 +16,6 @@ source = "app_blobs"
 destination = "/app/blobs"
 
 [[vm]]
-  memory = '256mb'
+  memory = '1gb'
   cpu_kind = 'shared'
   cpus = 1
