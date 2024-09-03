@@ -1,4 +1,3 @@
-import requests
 import feedparser
 from typing import Callable, Optional, Dict
 from lxml import etree

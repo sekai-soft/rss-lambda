@@ -8,7 +8,8 @@ from rss_lambda.lambdas import \
     filter_by_title_including_substrings,\
     filter_by_title_excluding_substrings,\
     filter_by_description_excluding_substrings,\
-    filter_by_description_containing_image
+    filter_by_description_containing_image,\
+    filter_by_description_containing_image_human
 from rss_lambda.rss_lambda import RSSLambdaError
 
 
@@ -86,6 +87,13 @@ def rss():
             rss_text_or_res = download_feed(url, request.headers)
             if isinstance(rss_text_or_res, str):
                 return Response(filter_by_description_containing_image(rss_text_or_res), mimetype='application/xml')
+            return rss_text_or_res
+        elif op == "filter_desc_cont_img_human":
+            if params:
+                return "No param expected", 400
+            rss_text_or_res = download_feed(url, request.headers)
+            if isinstance(rss_text_or_res, str):
+                return Response(filter_by_description_containing_image_human(rss_text_or_res), mimetype='application/xml')
             return rss_text_or_res
         else:
             return f"Unknown op {op}", 400
