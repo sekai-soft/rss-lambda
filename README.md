@@ -5,7 +5,7 @@ RSS-lambda is a webapp that performs operations on RSS feeds.
 
 ### Web UI
 
-There is a web UI available at [rss-lambda.ktachibana.party](https://rss-lambda.ktachibana.party)
+There is a web UI available at [rss-lambda.xyz](https://rss-lambda.xyz)
 
 From there, you can input what you want to do with the RSS feed,
 and the webapp will generate a feed URL after your specified operation.
@@ -29,25 +29,25 @@ https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss
 ### Filter a rss feed by including entries with certain keywords in their titles
 Your filtered feed url will be this if you want to only include entries with `keyword1` and `keyword2` in their titles
 ```
-https://rss-lambda.ktachibana.party/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_title_incl_substrs&param=keyword1&param=keyword2
+https://rss-lambda.xyz/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_title_incl_substrs&param=keyword1&param=keyword2
 ```
 
 ### Filter a rss feed by excluding entries with certain keywords in their titles
 Your filtered feed url will be this if you want to exclude entries with `keyword1` and `keyword2` in their titles
 ```
-https://rss-lambda.ktachibana.party/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_title_excl_substrs&param=keyword1&param=keyword2
+https://rss-lambda.xyz/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_title_excl_substrs&param=keyword1&param=keyword2
 ```
 
 ### Filter a rss feed by excluding entries with certain keywords in their descriptions
 Your filtered feed url will be this if you want to exclude entries with `keyword1` and `keyword2` in their descriptions
 ```
-https://rss-lambda.ktachibana.party/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_desc_excl_substrs&param=keyword1&param=keyword2
+https://rss-lambda.xyz/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_desc_excl_substrs&param=keyword1&param=keyword2
 ```
 
 ### Filter a rss feed by only including entries with image(s) in their descriptions
 Your filtered feed url will be this if you want to only include entries with image(s) in their descriptions
 ```
-https://rss-lambda.ktachibana.party/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_desc_cont_img
+https://rss-lambda.xyz/rss?url=https%3A%2F%2Fnitter.ktachibana.party%2Ftwitter_handle%2Frss&op=filter_desc_cont_img
 ```
 
 ## Like what you see?
