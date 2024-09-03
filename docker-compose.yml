@@ -5,4 +5,5 @@ services:
       - "5000:5000"
     # image: ghcr.io/sekai-soft/rss-lambda:latest
     build: .
-  
+    volumes:
+      - ./blobs:/app/blobs

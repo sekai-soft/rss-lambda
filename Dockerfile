@@ -1,7 +1,5 @@
 FROM python:3.12-slim-bullseye
 
-RUN apt-get update && apt-get install -y wget
-
 WORKDIR /app
 
 COPY ./requirements.txt /app/requirements.txt
