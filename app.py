@@ -8,15 +8,17 @@ from rss_lambda.lambdas import \
     filter_by_title_including_substrings,\
     filter_by_title_excluding_substrings,\
     filter_by_description_excluding_substrings,\
-    filter_by_description_containing_image,\
-    filter_by_description_containing_image_human
+    filter_by_description_containing_image
 from rss_lambda.rss_lambda import RSSLambdaError
+from rss_lambda.yolov3 import is_yolov3_available
+from rss_lambda.rss_image_recognition import rss_image_recognition
 
 
 if os.getenv('SENTRY_DSN'):
-    sentry_sdk.init(
-        dsn=os.getenv('SENTRY_DSN'),
-    )
+    print("Sentry enabled")
+    sentry_sdk.init(dsn=os.getenv('SENTRY_DSN'))
+else:
+    print("Sentry disabled")
 
 
 max_params = 50
@@ -38,6 +40,33 @@ def download_feed(rss_url: str, headers) -> Union[str, Response]:
         return res.text
     except Exception as _:
         return Response("Failed to download the feed", 500)
+
+
+@app.route("/rss_image_recog")
+def rss_image_recog():
+    if not is_yolov3_available():
+        return "Image recognition is not enabled", 400
+
+    # parse url
+    url = request.args.get('url', default=None)
+    if not url:
+        return "No url provided", 400
+    url = unquote(url)
+    parsed_url = urlparse(url)
+    if not all([parsed_url.scheme, parsed_url.netloc]):
+        return "Invalid url", 400
+    rss_text_or_res = download_feed(url, request.headers)
+    
+    # parse class_id
+    class_id = request.args.get('class_id', default=None)
+    if not class_id:
+        return "No class_id provided", 400
+    class_id = int(class_id)
+
+    try:
+        return Response(rss_image_recognition(rss_text_or_res, class_id, url), mimetype='application/xml')
+    except RSSLambdaError as e:
+        return e.message, 500
 
 
 @app.route("/rss")
@@ -87,13 +116,6 @@ def rss():
             rss_text_or_res = download_feed(url, request.headers)
             if isinstance(rss_text_or_res, str):
                 return Response(filter_by_description_containing_image(rss_text_or_res), mimetype='application/xml')
-            return rss_text_or_res
-        elif op == "filter_desc_cont_img_human":
-            if params:
-                return "No param expected", 400
-            rss_text_or_res = download_feed(url, request.headers)
-            if isinstance(rss_text_or_res, str):
-                return Response(filter_by_description_containing_image_human(rss_text_or_res), mimetype='application/xml')
             return rss_text_or_res
         else:
             return f"Unknown op {op}", 400
