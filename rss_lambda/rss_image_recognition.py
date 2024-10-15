@@ -7,6 +7,7 @@ import requests
 from typing import Optional
 from multiprocessing import Process
 from urllib.parse import urlparse
+from lxml import etree
 from .process_rss_text import process_rss_text, ParsedRssText
 from .lambdas import _extract_images_from_description
 from .yolov3 import yolov3
@@ -59,27 +60,41 @@ def _download_image(src: str) -> Optional[str]:
             logging.error(f"failed to download image from {src}: HTTP status {response.status_code}")
             return None
 
+def _create_item_element_with_image(img_src: str, item_element_tag: str) -> etree.Element:
+    item_element = etree.Element(item_element_tag)
+
+    title_element = etree.Element('title')
+    title_element.text = 'Image'
+    item_element.append(title_element)
+
+    description_element = etree.Element('description')
+    description_element.text = etree.CDATA(f'<img src="{img_src}"></img>')
+    item_element.append(description_element)
+
+    return item_element
+
 def _image_recognition(rss_text: str, class_id: int) -> str:
     def processor(parsed_rss_text: ParsedRssText):
         root = parsed_rss_text.root
         parent = parsed_rss_text.parent
         items = parsed_rss_text.items
 
-        transformed_items = []
+        matched_images = []
         for item in items:
             images = _extract_images_from_description(item, root.nsmap)
             for image in images:
-                downloaded_image_path = _download_image(image.get('src'))
+                img_src = image.get('src')
+                downloaded_image_path = _download_image(img_src)
                 if downloaded_image_path is None:
                     logging.error(f"failed to download image from {image.get('src')}")
                     continue
                 if yolov3(downloaded_image_path, 0.5, class_id):
-                    transformed_items.append(item)
+                    matched_images.append(_create_item_element_with_image(img_src, item.tag))
 
         # remove all items and appended kept items
         for item in items:
             parent.remove(item)
-        for item in transformed_items:
+        for item in matched_images:
             parent.append(item)
 
     return process_rss_text(rss_text, processor)
