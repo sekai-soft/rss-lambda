@@ -15,6 +15,7 @@
       feedUrl: '',
       isValidUrl: false,
       op: 'null',
+      shouldShowParamsInput: false,
       params: ['Keyword1'],
       newParam: '',
       resUrl: ''
@@ -32,6 +33,14 @@
         }
       );
 
+      // updates shouldShowParamsInput
+      $watch(
+        'isValidUrl, op',
+        () => {
+          shouldShowParamsInput = isValidUrl && op != 'null' && !op.startsWith('filter_desc_cont_img');
+        }
+      )
+
       // updates resUrl
       $watch(
         'feedUrl, op, params',
@@ -44,6 +53,20 @@
             urlObj.searchParams.append('url', encodeURI(feedUrl));
             urlObj.searchParams.append('op', op);
             resUrl = urlObj.href;
+          } else if (op.startsWith('filter_desc_cont_img')) {
+            const imageRecogUrlObj = new URL(window.location.protocol + '//' + window.location.host + '/rss_image_recog');
+            imageRecogUrlObj.searchParams.append('url', encodeURI(feedUrl));
+            // from https://github.com/LEGO999/YOLOV3-TF2/blob/master/classes.txt
+            let class_id = 0;
+            if (op == 'filter_desc_cont_img_human') {
+              class_id = 0;
+            } else if (op == 'filter_desc_cont_img_dog') {
+              class_id = 16;
+            } else if (op == 'filter_desc_cont_img_cat') {
+              class_id = 15;
+            }
+            imageRecogUrlObj.searchParams.append('class_id', class_id);
+            resUrl = imageRecogUrlObj.href;
           } else {
             urlObj.searchParams.append('url', encodeURI(feedUrl));
             urlObj.searchParams.append('op', op);
@@ -70,33 +93,42 @@
           Select an operation
         </option>
         <option value="filter_title_incl_substrs">
-          Title should include
+          Title should include keywords
         </option>
         <option value="filter_title_excl_substrs">
-          Title should exclude
+          Title should exclude keywords
         </option>
         <option value="filter_desc_excl_substrs">
-          Description should exclude
+          Content should exclude keywords
         </option>
         <option value="filter_desc_cont_img">
-          Description should contain image
+          Content should contain images
+        </option>
+        <option value="filter_desc_cont_img_human">
+          (BETA) Content should contain human images 👩
+        </option>
+        <option value="filter_desc_cont_img_dog">
+          (BETA) Content should contain dog images 🐶
+        </option>
+        <option value="filter_desc_cont_img_cat">
+          (BETA) Content should contain cat images 🐈
         </option>
       </select>
     </p>
     <template x-for="param in params">
       <div
         class="tag"
-        x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img'"
+        x-show="shouldShowParamsInput"
         @click="if (params.length == 1) return; params = params.filter(item => item !== param)"
         x-text="param + ' ⌫'">
       </div>
     </template>
-    <br x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img'">
+    <br x-show="shouldShowParamsInput">
     <input
       type="text"
       placeholder="Keyword"
       x-model="newParam"
-      x-show="isValidUrl && op != 'null' && op != 'filter_desc_cont_img' && params.length < 50"
+      x-show="shouldShowParamsInput && params.length < 50"
       class="short-input"
       @keydown.enter="if (!newParam || params.includes(newParam)) return; params = [...params, newParam]; newParam = ''"
     >
