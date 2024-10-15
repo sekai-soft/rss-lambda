@@ -1,3 +1,4 @@
+import os.path
 import shutil
 import unittest
 import unittest.mock
@@ -6,7 +7,8 @@ from .test_utils import nitter_rss20_response
 
 class ImageRecognitionTestCase(unittest.TestCase):
     def setUp(self):
-        shutil.rmtree('cache')
+        if os.path.exists('cache'):
+            shutil.rmtree('cache')
         self.maxDiff = None
 
     @unittest.mock.patch('rss_lambda.rss_image_recognition._download_image')
