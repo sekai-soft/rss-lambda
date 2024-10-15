@@ -61,6 +61,13 @@ def rss_image_recog():
     class_id = request.args.get('class_id', default=None)
     if not class_id:
         return "No class_id provided", 400
+    
+    # Hack for Reeder (iOS)
+    if class_id.endswith("/rss"):
+        class_id = class_id[:-4]
+    if class_id.endswith("/feed"):
+        class_id = class_id[:-5]
+
     class_id = int(class_id)
 
     try:

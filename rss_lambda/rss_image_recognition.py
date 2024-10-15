@@ -4,7 +4,7 @@ import logging
 import tempfile
 import hashlib
 import requests
-from typing import Optional
+from typing import Optional, Dict
 from multiprocessing import Process
 from urllib.parse import urlparse
 from lxml import etree
@@ -35,10 +35,24 @@ def _empty_list(rss_text: str) -> str:
     def processor(parsed_rss_text: ParsedRssText):
         parent = parsed_rss_text.parent
         items = parsed_rss_text.items
-    
+
         # remove all items
         for item in items:
             parent.remove(item)
+
+        # add item for notice
+        if items:
+            notice_item_element = etree.Element(items[0].tag)
+
+            title_element = etree.Element('title')
+            title_element.text = 'Processing, please wait...'
+            notice_item_element.append(title_element)
+
+            guid_element = etree.Element('guid')
+            guid_element.text = "Processing, please wait..."
+            notice_item_element.append(guid_element)
+
+            parent.append(notice_item_element)
 
     return process_rss_text(rss_text, processor)
 
@@ -60,7 +74,7 @@ def _download_image(src: str) -> Optional[str]:
             logging.error(f"failed to download image from {src}: HTTP status {response.status_code}")
             return None
 
-def _create_item_element_with_image(img_src: str, item_element_tag: str) -> etree.Element:
+def _create_item_element_with_image(img_src: str, item_element_tag: str, original_link: Optional[str]=None) -> etree.Element:
     item_element = etree.Element(item_element_tag)
 
     title_element = etree.Element('title')
@@ -71,7 +85,21 @@ def _create_item_element_with_image(img_src: str, item_element_tag: str) -> etre
     description_element.text = etree.CDATA(f'<img src="{img_src}"></img>')
     item_element.append(description_element)
 
+    guid_element = etree.Element('guid')
+    guid_element.text = img_src
+    item_element.append(guid_element)
+
+    link_element = etree.Element('link')
+    link_element.text = original_link if original_link else img_src
+    item_element.append(link_element)
+
     return item_element
+
+def _extract_link(e: etree.Element, root_nsmap: Dict) -> Optional[str]:
+    link_e = e.find('link', root_nsmap)
+    if link_e is None:
+        return None
+    return link_e.text
 
 def _image_recognition(rss_text: str, class_id: int) -> str:
     def processor(parsed_rss_text: ParsedRssText):
@@ -89,7 +117,10 @@ def _image_recognition(rss_text: str, class_id: int) -> str:
                     logging.error(f"failed to download image from {image.get('src')}")
                     continue
                 if yolov3(downloaded_image_path, 0.5, class_id):
-                    matched_images.append(_create_item_element_with_image(img_src, item.tag))
+                    matched_images.append(_create_item_element_with_image(
+                        img_src,
+                        item.tag,
+                        _extract_link(item, root.nsmap)))
 
         # remove all items and appended kept items
         for item in items:
