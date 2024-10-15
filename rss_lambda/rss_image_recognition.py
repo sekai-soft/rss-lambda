@@ -31,6 +31,9 @@ def _read_cache(hash_key: str, suffix: str) -> str:
     with open(_get_cache_path(hash_key, suffix)) as f:
         return f.read()
 
+def _remove_cache(hash_key: str, suffix: str):
+    os.remove(_get_cache_path(hash_key, suffix))
+
 def _empty_list(rss_text: str) -> str:
     def processor(parsed_rss_text: ParsedRssText):
         parent = parsed_rss_text.parent
@@ -45,11 +48,11 @@ def _empty_list(rss_text: str) -> str:
             notice_item_element = etree.Element(items[0].tag)
 
             title_element = etree.Element('title')
-            title_element.text = 'Processing, please wait...'
+            title_element.text = 'Processing, please refresh later...'
             notice_item_element.append(title_element)
 
             guid_element = etree.Element('guid')
-            guid_element.text = "Processing, please wait..."
+            guid_element.text = "Processing, please refresh later..."
             notice_item_element.append(guid_element)
 
             parent.append(notice_item_element)
@@ -133,6 +136,7 @@ def _image_recognition(rss_text: str, class_id: int) -> str:
 
 ORIGINAL_CACHE_SUFFIX = 'original'
 PROCESSED_CACHE_SUFFIX = 'processed'
+PROCESSING_LOCK_CACHE_SUFFIX = 'processing-lock'
 
 def rss_image_recognition(rss_text: str, class_id: int, url: str):
     # obtain hash key
@@ -142,22 +146,21 @@ def rss_image_recognition(rss_text: str, class_id: int, url: str):
     hash_key = h.hexdigest()
 
     if not _cache_exists(hash_key, ORIGINAL_CACHE_SUFFIX):
-        # original cache does not exist, process and cache original and processed
-        logging.info(f"original cache does not exist for {hashed_text}, processing")
+        # original cache does not exist, start processing (use processed cache as lock)
+        logging.info(f"(first processing) original cache does not exist for {hashed_text}, start processing")
         _write_cache(hash_key, ORIGINAL_CACHE_SUFFIX, rss_text)
 
         def _process():
             processed_rss_text = _image_recognition(rss_text, class_id)
             _write_cache(hash_key, PROCESSED_CACHE_SUFFIX, processed_rss_text)
-            logging.info(f"processed and cached {hashed_text}")
+            logging.info(f"(first processing) processed and cached {hashed_text}")
         Process(target=_process).start()
 
         return _empty_list(rss_text)
 
     if not _cache_exists(hash_key, PROCESSED_CACHE_SUFFIX):
-        # original cache exists but processed cache does not exist, 
-        # it is being processed, return empty list
-        logging.info(f"processed cache does not exist for {hashed_text}. it is still processing")
+        # original cache exists but processed cache does not exist. it is being processed, return empty list.
+        logging.info(f"(first processing) processed cache does not exist for {hashed_text} so it's still processing")
         return _empty_list(rss_text)
 
     processed_cache = _read_cache(hash_key, PROCESSED_CACHE_SUFFIX)
@@ -166,13 +169,19 @@ def rss_image_recognition(rss_text: str, class_id: int, url: str):
         logging.info(f"original cache exists for {hashed_text} and was not updated, returning processed cache")
         return processed_cache
 
-    # original cache exists but was updated,
-    # process and cache updated original and updated processed
-    logging.info(f"original cache exists for {hashed_text} but was updated, processing")
+    if _cache_exists(hash_key, PROCESSING_LOCK_CACHE_SUFFIX):
+        # original cache exists but was updated and is still processing, return processed cache
+        logging.info(f"original cache exists for {hashed_text} but was updated and is still processing")
+        return processed_cache
+
+    # original cache exists but was updated and hasn't been processed yet, start processing and return processed cache
+    logging.info(f"original cache exists for {hashed_text} but was updated, start processing")
+    _write_cache(hash_key, PROCESSING_LOCK_CACHE_SUFFIX, 'locked')
     def _process():
         processed_rss_text = _image_recognition(rss_text, class_id)
         _write_cache(hash_key, ORIGINAL_CACHE_SUFFIX, rss_text)
         _write_cache(hash_key, PROCESSED_CACHE_SUFFIX, processed_rss_text)
+        _remove_cache(hash_key, PROCESSING_LOCK_CACHE_SUFFIX)
         logging.info(f"processed and cached {hashed_text}")
     Process(target=_process).start()
 
