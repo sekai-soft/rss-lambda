@@ -2,12 +2,7 @@ import feedparser
 from typing import List, Callable
 from dataclasses import dataclass
 from lxml import etree
-
-
-class RSSLambdaError(Exception):
-     def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
+from .rss_lambda_error import RSSLambdaError
 
 supported_feed_versions = ["rss20", "atom10", "atom03"]
 xml_declaration = '<?xml version="1.0" encoding="UTF-8"?>'

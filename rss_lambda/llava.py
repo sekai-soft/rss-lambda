@@ -2,7 +2,6 @@ import enum
 import logging
 import ollama
 import base64
-import json
 from multiprocessing import Process
 
 
@@ -33,7 +32,7 @@ class LlavaResult(enum.Enum):
 
 PROMPT = """
 Is there a human in this image? If yes, do they show male or female characteristics?
-Return only in valid JSON string with one JSON key "result" and value being either "no", "male" or "female".
+Return only one of those three strings: "no", "male" or "female".
 """
 
 
@@ -46,12 +45,13 @@ def llava(image_path: str) -> LlavaResult:
         prompt=PROMPT,
         images=[encoded_image])
     response = response['response']
+    response = response.lower()
 
-    # response might still return markdown wrapper so sanitize it
-    response = response.replace('```markdown', '').replace('```', '').strip()
-    try:
-        response = json.loads(response)
-        return LlavaResult(response['result'])
-    except Exception as e:
-        logging.error(f"error parsing response: {response}, {e}")
-        return LlavaResult.ERROR
+    if "female" in response:
+        return LlavaResult.FEMALE
+    elif "male" in response:
+        return LlavaResult.MALE
+    elif "no" in response:
+        return LlavaResult.NO
+    logging.error(f"llava failed to process image {image_path}, response was: {response}")
+    return LlavaResult.ERROR

@@ -9,9 +9,11 @@ from rss_lambda.lambdas import \
     filter_by_title_excluding_substrings,\
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
-from rss_lambda.rss_lambda import RSSLambdaError
+from rss_lambda.rss_lambda_error import RSSLambdaError
 from rss_lambda.yolov3 import is_yolov3_available
 from rss_lambda.rss_image_recognition import rss_image_recognition
+from rss_lambda.llava import is_llava_available
+from rss_lambda.rss_image_gender import rss_image_gender
 
 
 if os.getenv('SENTRY_DSN'):
@@ -43,7 +45,7 @@ def download_feed(rss_url: str, headers) -> Union[str, Response]:
 
 
 @app.route("/rss_image_recog")
-def rss_image_recog():
+def _rss_image_recog():
     if not is_yolov3_available():
         return "Image recognition is not enabled", 400
 
@@ -75,6 +77,40 @@ def rss_image_recog():
     except RSSLambdaError as e:
         return e.message, 500
 
+
+@app.route("/rss_image_gender")
+def _rss_image_gender():
+    if not is_llava_available():
+        return "Image render is not enabled", 400
+
+    # parse url
+    url = request.args.get('url', default=None)
+    if not url:
+        return "No url provided", 400
+    url = unquote(url)
+    parsed_url = urlparse(url)
+    if not all([parsed_url.scheme, parsed_url.netloc]):
+        return "Invalid url", 400
+    rss_text_or_res = download_feed(url, request.headers)
+
+    # parse gender
+    gender = request.args.get('gender', default=None)
+    if not gender:
+        return "No gender provided", 400
+    
+    # Hack for Reeder (iOS)
+    if gender.endswith("/rss"):
+        gender = gender[:-4]
+    if gender.endswith("/feed"):
+        gender = gender[:-5]
+
+    gender = gender == '1'
+
+    try:
+        return Response(rss_image_gender(rss_text_or_res, gender, url), mimetype='application/xml')
+    except RSSLambdaError as e:
+        return e.message, 500
+    
 
 @app.route("/rss")
 def rss():

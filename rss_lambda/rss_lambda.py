@@ -2,11 +2,6 @@ from typing import Callable, Optional, Dict
 from lxml import etree
 from .process_rss_text import ParsedRssText, process_rss_text
 
-class RSSLambdaError(Exception):
-     def __init__(self, message):
-        self.message = message
-        super().__init__(self.message)
-
 def rss_lambda(
         rss_text: str,
         rss_item_lambda: Callable[[etree.Element, Dict], Optional[etree.Element]]
