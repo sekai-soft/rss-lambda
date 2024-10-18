@@ -9,8 +9,7 @@ from .process_rss_text import process_rss_text, ParsedRssText
 
 
 _cache_root_path = os.path.join('cache')
-if not os.path.exists(_cache_root_path):
-    os.mkdir(_cache_root_path)
+os.makedirs(_cache_root_path, exist_ok=True)
 
 def _get_cache_path(hash_key: str, suffix: str) -> str:
     return os.path.join(_cache_root_path, f"{hash_key}-{suffix}")

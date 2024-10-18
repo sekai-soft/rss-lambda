@@ -3,6 +3,7 @@ import logging
 import cv2
 import numpy as np
 from .rss_image_utils import _download_image
+from .file_cache import file_cache
 
 YOLOV3_WEIGHTS_PATH = os.path.join('blobs', 'yolov3.weights')
 YOLOV3_CFG_PATH = os.path.join('blobs', 'yolov3.cfg')
@@ -12,6 +13,7 @@ def is_yolov3_available():
     return os.path.exists(YOLOV3_WEIGHTS_PATH) and os.path.exists(YOLOV3_CFG_PATH)
 
 
+@file_cache(verbose=True)
 def yolov3(image_url: str, confidence_threshold: float, desired_class_id: int) -> bool:
     # Downlaod image
     image_path = _download_image(image_url)

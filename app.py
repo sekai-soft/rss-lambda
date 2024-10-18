@@ -2,7 +2,7 @@ import os
 import requests
 import sentry_sdk
 from typing import Union
-from flask import Flask, request, Response, send_from_directory
+from flask import Flask, request, Response, send_from_directory, send_file
 from urllib.parse import unquote, urlparse
 from rss_lambda.lambdas import \
     filter_by_title_including_substrings,\
@@ -113,7 +113,7 @@ def _rss_image_gender():
     
 
 @app.route("/rss")
-def rss():
+def _rss():
     # parse url
     url = request.args.get('url', default=None)
     if not url:
@@ -164,3 +164,8 @@ def rss():
             return f"Unknown op {op}", 400
     except RSSLambdaError as e:
         return e.message, 500
+
+
+@app.route("/test_rss")
+def _test_rss():
+    return send_file('test-rss.xml', 'application/xml')
