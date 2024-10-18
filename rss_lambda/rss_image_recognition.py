@@ -1,9 +1,8 @@
-import logging
 from .process_rss_text import process_rss_text, ParsedRssText
 from .lambdas import _extract_images_from_description
 from .yolov3 import yolov3
 from .abstract_expensive_rss_lambda import abstract_expensive_rss_lambda
-from .rss_image_utils import _download_image, _create_item_element_with_image, _extract_link
+from .rss_image_utils import _create_item_element_with_image, _extract_link
 
 def _image_recognition(rss_text: str, class_id: int) -> str:
     def processor(parsed_rss_text: ParsedRssText):
@@ -16,11 +15,7 @@ def _image_recognition(rss_text: str, class_id: int) -> str:
             images = _extract_images_from_description(item, root.nsmap)
             for image in images:
                 img_src = image.get('src')
-                downloaded_image_path = _download_image(img_src)
-                if downloaded_image_path is None:
-                    logging.error(f"failed to download image from {image.get('src')}")
-                    continue
-                if yolov3(downloaded_image_path, 0.5, class_id):
+                if yolov3(img_src, 0.5, class_id):
                     matched_images.append(_create_item_element_with_image(
                         img_src,
                         item.tag,

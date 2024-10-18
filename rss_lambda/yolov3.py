@@ -1,6 +1,8 @@
 import os
+import logging
 import cv2
 import numpy as np
+from .rss_image_utils import _download_image
 
 YOLOV3_WEIGHTS_PATH = os.path.join('blobs', 'yolov3.weights')
 YOLOV3_CFG_PATH = os.path.join('blobs', 'yolov3.cfg')
@@ -10,7 +12,13 @@ def is_yolov3_available():
     return os.path.exists(YOLOV3_WEIGHTS_PATH) and os.path.exists(YOLOV3_CFG_PATH)
 
 
-def yolov3(image_path: str, confidence_threshold: float, desired_class_id: int) -> bool:
+def yolov3(image_url: str, confidence_threshold: float, desired_class_id: int) -> bool:
+    # Downlaod image
+    image_path = _download_image(image_url)
+    if image_path is None:
+        logging.error(f"failed to download image from {image.get('src')}")
+        return False
+
     # Load YOLO
     net = cv2.dnn.readNet(YOLOV3_WEIGHTS_PATH, YOLOV3_CFG_PATH)
     layer_names = net.getLayerNames()

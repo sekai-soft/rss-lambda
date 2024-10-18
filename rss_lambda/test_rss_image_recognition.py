@@ -64,7 +64,7 @@ nitter_rss20_processed_response_2 = """<?xml version="1.0" encoding="UTF-8"?>
 
 def fake_yolov3(image_path: str, confidence_threshold: float, desired_class_id: int):
     time.sleep(0.1)
-    return image_path != '/does_not_exist_tmp/pic2.jpg'
+    return image_path != 'https://nitter.example.com/twitter_handle/pic/pic2.jpg'
 
 
 class ImageRecognitionTestCase(unittest.TestCase):
@@ -74,24 +74,8 @@ class ImageRecognitionTestCase(unittest.TestCase):
         os.makedirs('cache')
         self.maxDiff = None
 
-    @patch('rss_lambda.rss_image_recognition._download_image')
     @patch('rss_lambda.rss_image_recognition.yolov3', wraps=fake_yolov3)
-    def test_image_recognition(
-        self,
-        _,
-        mocked_download_image):
-
-        mocked_download_image.side_effect = [
-            # first rss text
-            '/does_not_exist_tmp/pic1.jpg',
-            '/does_not_exist_tmp/pic2.jpg',
-            '/does_not_exist_tmp/pic3.jpg',
-            # second rss text
-            '/does_not_exist_tmp/pic1.jpg',
-            '/does_not_exist_tmp/pic2.jpg',
-            '/does_not_exist_tmp/pic3.jpg',
-            '/does_not_exist_tmp/pic4.jpg',]
-
+    def test_image_recognition(self, _):
         with self.assertLogs('root', level='INFO') as log_context_manager:
             # first call should return processing response but processing had been kicked off
             self.assertEqual(
