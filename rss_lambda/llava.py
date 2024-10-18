@@ -1,8 +1,19 @@
-import enum
 import logging
 import ollama
 import base64
 from multiprocessing import Process
+from PIL import Image
+from cachew import cachew
+from .rss_image_utils import _download_image
+
+DOWNSIZE_SIZE = (50, 50)
+
+
+def _downsize_image(image_path: str):
+    image = Image.open(image_path)
+    image = image.convert('RGB')
+    image.thumbnail(DOWNSIZE_SIZE)
+    image.save(image_path)
 
 
 LLAVA_MODEL_NAME = 'llava:latest'
@@ -23,11 +34,10 @@ def is_llava_available():
     return False
 
 
-class LlavaResult(enum.Enum):
-    NO = "no"
-    MALE = "male"
-    FEMALE = "female"
-    ERROR = "error"
+LLAVA_RESULT_NO = "no"
+LLAVA_RESULT_MALE = "male"
+LLAVA_RESULT_FEMALE = "female"
+LLAVA_RESULT_ERROR = "error"
 
 
 PROMPT = """
@@ -36,7 +46,14 @@ Return only one of those three strings: "no", "male" or "female".
 """
 
 
-def llava(image_path: str) -> LlavaResult:
+@cachew
+def llava(image_url: str) -> str:
+    image_path = _download_image(image_url)
+    if image_path is None:
+        logging.error(f"failed to download image from {image_url}")
+        return LLAVA_RESULT_ERROR
+    _downsize_image(image_path)
+
     with open(image_path, "rb") as f:
         encoded_image = base64.b64encode(f.read())
 
@@ -48,10 +65,10 @@ def llava(image_path: str) -> LlavaResult:
     response = response.lower()
 
     if "female" in response:
-        return LlavaResult.FEMALE
+        return LLAVA_RESULT_FEMALE
     elif "male" in response:
-        return LlavaResult.MALE
+        return LLAVA_RESULT_MALE
     elif "no" in response:
-        return LlavaResult.NO
+        return LLAVA_RESULT_NO
     logging.error(f"llava failed to process image {image_path}, response was: {response}")
-    return LlavaResult.ERROR
+    return LLAVA_RESULT_ERROR
