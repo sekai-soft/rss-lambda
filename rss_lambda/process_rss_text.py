@@ -18,7 +18,7 @@ def process_rss_text(rss_text: str, processor: Callable[[ParsedRssText], None]) 
     # Determine if it's a valid and supported feed
     feed = feedparser.parse(rss_text)
     if feed.bozo != 0:
-        raise RSSLambdaError(f"Failed to parse the feed")
+        raise RSSLambdaError(f"Failed to parse the feed: {feed.bozo_exception}")
     if feed.version not in supported_feed_versions:
         raise RSSLambdaError(f"Unsupported feed version: {feed.version}")
 
