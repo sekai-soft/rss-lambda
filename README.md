@@ -86,7 +86,7 @@ The image recognition endpoints are not enabled by default. In order to enable t
 
 1. Download the model. Create a new directory `blobs` under the docker compose root directory, download and run the [`download.sh`](https://github.com/sekai-soft/rss-lambda/blob/master/blobs/download.sh) file under that `blobs` directory.
 
-2. Use the following `docker-compose.yml` file to run the program
+2. Use the following `docker-compose.yml` file instead to run the program
 ```yaml
 services:
   app:
@@ -96,6 +96,8 @@ services:
     image: ghcr.io/sekai-soft/rss-lambda:latest
     volumes:
       - ./blobs:/app/blobs
+      - ./cache:/app/cache
+      - ./file_cache:/app/file_cache
 ```
 
 ## Development
