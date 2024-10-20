@@ -50,11 +50,28 @@ Your filtered feed url will be this if you want to only include entries with ima
 https://rss-lambda.xyz/rss?url=https%3A%2F%2Fnitter.example.net%2Ftwitter_handle%2Frss&op=filter_desc_cont_img
 ```
 
-## Self-host
+### (BETA) Filter a rss feed by only including entries with human image(s) in their descriptions
+Your filtered feed url will be this if you want to only include entries with human image(s) in their descriptions
+```
+https://rss-lambda.xyz/rss_image_recog?url=https%3A%2F%2Fnitter.example.net%2Ftwitter_handle%2Frss&op=filter_desc_cont_img
+```
+
+### (BETA) Filter a rss feed by only including entries with dog image(s) in their descriptions
+Your filtered feed url will be this if you want to only include entries with dog image(s) in their descriptions
+```
+https://rss-lambda.xyz/rss_image_recog?url=https%3A%2F%2Fnitter.example.net%2Ftwitter_handle%2Frss&op=filter_desc_cont_img_dog
+```
+
+### (BETA) Filter a rss feed by only including entries with cat image(s) in their descriptions
+Your filtered feed url will be this if you want to only include entries with cat image(s) in their descriptions
+```
+https://rss-lambda.xyz/rss_image_recog?url=https%3A%2F%2Fnitter.example.net%2Ftwitter_handle%2Frss&op=filter_desc_cont_img_cat
+```
+
+## Self-hosting
 
 You can use the following `docker-compose.yml` to run the program
 ```yaml
-version: '3'
 services:
   app:
     restart: always
@@ -63,18 +80,22 @@ services:
     image: ghcr.io/sekai-soft/rss-lambda:latest
 ```
 
-The program will be exposed at port 5000 and you can then use a reverse proxy like Nginx to expose it to the Internet
+The web UI will be exposed at port 5000
 
-Optionally you can specify the port that the program listens to. This is useful in scenarios such as [setting up a Tailscale sidecar](https://tailscale.com/blog/docker-tailscale-guide?utm_source=pocket_reader) where you need to have the program listen to port 80
+The image recognition endpoints are not enabled by default. In order to enable them, you need to
+
+1. Download the model. Create a new directory `blobs` under the docker compose root directory, download and run the [`download.sh`](https://github.com/sekai-soft/rss-lambda/blob/master/blobs/download.sh) file under that `blobs` directory.
+
+2. Use the following `docker-compose.yml` file to run the program
 ```yaml
-version: '3'
 services:
   app:
     restart: always
+    ports:
+      - "5000:5000"
     image: ghcr.io/sekai-soft/rss-lambda:latest
-    environment:
-      - PORT=80
-    # network_mode: service:tailscale-sidecar
+    volumes:
+      - ./blobs:/app/blobs
 ```
 
 ## Development
