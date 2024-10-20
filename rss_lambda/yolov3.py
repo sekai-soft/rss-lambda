@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 import cv2
 import numpy as np
 from .rss_image_utils import _download_image
@@ -15,6 +16,8 @@ def is_yolov3_available():
 
 @file_cache(verbose=True)
 def yolov3(image_url: str, confidence_threshold: float, desired_class_id: int) -> bool:
+    start_time = time.time()
+
     # Downlaod image
     image_path = _download_image(image_url)
     if image_path is None:
@@ -35,11 +38,15 @@ def yolov3(image_url: str, confidence_threshold: float, desired_class_id: int) -
     outs = net.forward(output_layers)
 
     # Information for each object detected
+    res = False
     for out in outs:
         for detection in out:
             scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
             if confidence > confidence_threshold and class_id == desired_class_id:
-                return True
-    return False
+                res = True
+                break
+
+    logging.info(f"yolov3 took {time.time() - start_time} seconds")
+    return res
