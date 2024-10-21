@@ -3,7 +3,6 @@ import ollama
 import base64
 from multiprocessing import Process
 from PIL import Image
-from cachew import cachew
 from .rss_image_utils import _download_image
 
 DOWNSIZE_SIZE = (50, 50)
@@ -46,7 +45,6 @@ Return only one of those three strings: "no", "male" or "female".
 """
 
 
-@cachew
 def llava(image_url: str) -> str:
     image_path = _download_image(image_url)
     if image_path is None:
