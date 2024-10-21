@@ -7,5 +7,4 @@ sentry-sdk[flask]==1.43.0
 opencv-python-headless==4.10.0.84
 ollama==0.3.3
 pillow==11.0.0
-cachew==0.17.20241017
-colorlog==6.8.2
+tensorflow==2.17.0

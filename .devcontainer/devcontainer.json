@@ -12,9 +12,9 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip3 install --user -r requirements.txt && ollama pull llava",
+	"postCreateCommand": "pip3 install --user -r requirements.txt",
 	"features": {
-		"ghcr.io/prulloac/devcontainer-features/ollama:1": {}
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}
 
 	// Configure tool-specific properties.
