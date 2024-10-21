@@ -88,7 +88,7 @@ def file_cache(ignore_params=[], verbose=False):
                 # If cache exists, load and return it
                 if os.path.exists(cache_file):
                     if verbose:
-                        print("Used cache for function: " + func.__name__)
+                        print("Used cache for function: " + func.__name__ + " and args hash: " + arg_hash)
                     with open(cache_file, "rb") as f:
                         return pickle.load(f)
             except Exception:

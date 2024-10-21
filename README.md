@@ -100,8 +100,6 @@ services:
       - ./file_cache:/app/file_cache
 ```
 
-TODO: `docker run -p 8501:8501 --mount type=bind,source=./blobs/yolov3,target=/models/yolov3 -e MODEL_NAME=yolov3 -t tensorflow/serving`
-
 ## Development
 
 Open in VSCode, then run
