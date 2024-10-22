@@ -3,7 +3,7 @@ import shutil
 import time
 import unittest
 from unittest.mock import patch
-from .rss_image_recognition import rss_image_recognition
+from .rss_image_recognition_tf import rss_image_recognition_tf
 from .test_utils import nitter_rss20_response
 
 rss_text = nitter_rss20_response([
@@ -62,7 +62,7 @@ nitter_rss20_processed_response_2 = """<?xml version="1.0" encoding="UTF-8"?>
     <item><title>Image</title><description><![CDATA[<img src="https://nitter.example.com/twitter_handle/pic/pic1.jpg"></img>]]></description><guid>https://nitter.example.com/twitter_handle/pic/pic1.jpg</guid><link>http://nitter.example.com/twitter_handle/status/-1#m</link></item><item><title>Image</title><description><![CDATA[<img src="https://nitter.example.com/twitter_handle/pic/pic3.jpg"></img>]]></description><guid>https://nitter.example.com/twitter_handle/pic/pic3.jpg</guid><link>http://nitter.example.com/twitter_handle/status/-1#m</link></item><item><title>Image</title><description><![CDATA[<img src="https://nitter.example.com/twitter_handle/pic/pic4.jpg"></img>]]></description><guid>https://nitter.example.com/twitter_handle/pic/pic4.jpg</guid><link>http://nitter.example.com/twitter_handle/status/-1#m</link></item></channel>
 </rss>"""
 
-def fake_yolov3(image_path: str, confidence_threshold: float, desired_class_id: int):
+def fake_yolov3_tf(image_path: str, desired_class_id: int):
     time.sleep(0.1)
     return image_path != 'https://nitter.example.com/twitter_handle/pic/pic2.jpg'
 
@@ -74,46 +74,46 @@ class ImageRecognitionTestCase(unittest.TestCase):
         os.makedirs('cache')
         self.maxDiff = None
 
-    @patch('rss_lambda.rss_image_recognition.yolov3', wraps=fake_yolov3)
-    def test_image_recognition(self, _):
+    @patch('rss_lambda.rss_image_recognition_tf.yolov3_tf', wraps=fake_yolov3_tf)
+    def test_image_recognition_tf(self, _):
         with self.assertLogs('root', level='INFO') as log_context_manager:
             # first call should return processing response but processing had been kicked off
             self.assertEqual(
-                rss_image_recognition(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
+                rss_image_recognition_tf(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
                 nitter_rss20_processing_response)
             
             # subsequent calls should return processing response; we'll assert that no duplicate processing is kicked off later via log lines            
             for _ in range(5):
                 self.assertEqual(
-                    rss_image_recognition(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
+                    rss_image_recognition_tf(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
                     nitter_rss20_processing_response)
 
             time.sleep(1)
             # by this time processing should have been completed; should return processed response
             self.assertEqual(
-                rss_image_recognition(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
+                rss_image_recognition_tf(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
                 nitter_rss20_processed_response)
             
             # subsequent calls should return the same processed response as long as input rss text doesn't change            
             for _ in range(5):
                 self.assertEqual(
-                    rss_image_recognition(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
+                    rss_image_recognition_tf(rss_text, 0, 'http://nitter.example.com/twitter_handle'),
                     nitter_rss20_processed_response)
 
             # first call with updated rss text should return the first processed response but processing had been kicked off
             self.assertEqual(
-                rss_image_recognition(rss_text_2, 0, 'http://nitter.example.com/twitter_handle'),
+                rss_image_recognition_tf(rss_text_2, 0, 'http://nitter.example.com/twitter_handle'),
                 nitter_rss20_processed_response)
             
             # subsequent calls should return the first processed response; we'll assert that no duplicate processing is kicked off later via log lines            
             for _ in range(5):
                 self.assertEqual(
-                    rss_image_recognition(rss_text_2, 0, 'http://nitter.example.com/twitter_handle'),
+                    rss_image_recognition_tf(rss_text_2, 0, 'http://nitter.example.com/twitter_handle'),
                     nitter_rss20_processed_response)
             time.sleep(1)
             # by this time processing should have been completed; should return second processed response
             self.assertEqual(
-                rss_image_recognition(rss_text_2, 0, 'http://nitter.example.com/twitter_handle'),
+                rss_image_recognition_tf(rss_text_2, 0, 'http://nitter.example.com/twitter_handle'),
                 nitter_rss20_processed_response_2)
 
         # processing should only be triggered twice, once for each rss text
@@ -122,4 +122,3 @@ class ImageRecognitionTestCase(unittest.TestCase):
             if 'start processing' in log:
                 processing_triggerd += 1
         self.assertEqual(processing_triggerd, 2)
-

@@ -10,8 +10,6 @@ from rss_lambda.lambdas import \
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
 from rss_lambda.rss_lambda_error import RSSLambdaError
-from rss_lambda.yolov3 import is_yolov3_available
-from rss_lambda.rss_image_recognition import rss_image_recognition
 from rss_lambda.llava import is_llava_available
 from rss_lambda.rss_image_gender import rss_image_gender
 from rss_lambda.rss_image_recognition_tf import rss_image_recognition_tf
@@ -43,40 +41,6 @@ def download_feed(rss_url: str, headers) -> Union[str, Response]:
         return res.text
     except Exception as _:
         return Response("Failed to download the feed", 500)
-
-
-@app.route("/rss_image_recog_old")
-def _rss_image_recog_old():
-    if not is_yolov3_available():
-        return "Image recognition is not enabled", 400
-
-    # parse url
-    url = request.args.get('url', default=None)
-    if not url:
-        return "No url provided", 400
-    url = unquote(url)
-    parsed_url = urlparse(url)
-    if not all([parsed_url.scheme, parsed_url.netloc]):
-        return "Invalid url", 400
-    rss_text_or_res = download_feed(url, request.headers)
-    
-    # parse class_id
-    class_id = request.args.get('class_id', default=None)
-    if not class_id:
-        return "No class_id provided", 400
-    
-    # Hack for Reeder (iOS)
-    if class_id.endswith("/rss"):
-        class_id = class_id[:-4]
-    if class_id.endswith("/feed"):
-        class_id = class_id[:-5]
-
-    class_id = int(class_id)
-
-    try:
-        return Response(rss_image_recognition(rss_text_or_res, class_id, url), mimetype='application/xml')
-    except RSSLambdaError as e:
-        return e.message, 500
 
 
 @app.route("/rss_image_recog")
