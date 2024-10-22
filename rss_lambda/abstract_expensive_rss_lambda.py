@@ -104,7 +104,7 @@ def abstract_expensive_rss_lambda(rss_text: str, expensive_operation, hash: str,
             # original cache exists but was updated and processing lock is stale, remove and reprocess
             logging.info(f"original cache exists for {hash} but was updated and processing lock is stale, removing")
             _remove_cache(hash_key, PROCESSING_LOCK_CACHE_SUFFIX)
-            return _empty_list(rss_text)
+            return processed_cache
 
         # original cache exists but was updated and is still processing, return processed cache
         logging.info(f"original cache exists for {hash} but was updated and is still processing")
