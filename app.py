@@ -45,8 +45,8 @@ def download_feed(rss_url: str, headers) -> Union[str, Response]:
         return Response("Failed to download the feed", 500)
 
 
-@app.route("/rss_image_recog")
-def _rss_image_recog():
+@app.route("/rss_image_recog_old")
+def _rss_image_recog_old():
     if not is_yolov3_available():
         return "Image recognition is not enabled", 400
 
@@ -79,8 +79,8 @@ def _rss_image_recog():
         return e.message, 500
 
 
-@app.route("/rss_image_recog_tf")
-def rss_image_recog_tf():
+@app.route("/rss_image_recog")
+def _rss_image_recog():
     # parse url
     url = request.args.get('url', default=None)
     if not url:
