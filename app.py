@@ -54,7 +54,9 @@ def _rss_image_recog():
     if not all([parsed_url.scheme, parsed_url.netloc]):
         return "Invalid url", 400
     rss_text_or_res = download_feed(url, request.headers)
-    
+    if not isinstance(rss_text_or_res, str):
+        return rss_text_or_res
+
     # parse class_id
     class_id = request.args.get('class_id', default=None)
     if not class_id:
@@ -88,6 +90,8 @@ def _rss_image_gender():
     if not all([parsed_url.scheme, parsed_url.netloc]):
         return "Invalid url", 400
     rss_text_or_res = download_feed(url, request.headers)
+    if not isinstance(rss_text_or_res, str):
+        return rss_text_or_res
 
     # parse gender
     gender = request.args.get('gender', default=None)
