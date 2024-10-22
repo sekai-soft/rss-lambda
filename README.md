@@ -19,11 +19,12 @@ From the web UI, you can tell it what you want to do with the RSS feed, and it w
 Transformations include
 * Filter a rss feed by including entries with certain keywords in their titles
 * Filter a rss feed by excluding entries with certain keywords in their titles
-* Filter a rss feed by excluding entries with certain keywords in their descriptions
-* Filter a rss feed by only including entries with image(s) in their descriptions
-* (BETA) Filter a rss feed by only including entries with human image(s) in their descriptions
-* (BETA) Filter a rss feed by only including entries with cat image(s) in their descriptions
-* (BETA) Filter a rss feed by only including entries with dog image(s) in their descriptions
+* Filter a rss feed by including entries with certain keywords in their contents
+* Filter a rss feed by excluding entries with certain keywords in their contents
+* Filter a rss feed by only including entries with image(s) in their contents
+* (BETA) Filter a rss feed by only including entries with human image(s) in their contents
+* (BETA) Filter a rss feed by only including entries with cat image(s) in their contents
+* (BETA) Filter a rss feed by only including entries with dog image(s) in their contents
 
 ## Self-hosting
 

@@ -7,6 +7,7 @@ from urllib.parse import unquote, urlparse
 from rss_lambda.lambdas import \
     filter_by_title_including_substrings,\
     filter_by_title_excluding_substrings,\
+    filter_by_description_including_substrings,\
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
 from rss_lambda.rss_lambda_error import RSSLambdaError
@@ -145,6 +146,13 @@ def _rss():
             rss_text_or_res = download_feed(url, request.headers)
             if isinstance(rss_text_or_res, str):
                 return Response(filter_by_title_excluding_substrings(rss_text_or_res, params), mimetype='application/xml')
+            return rss_text_or_res
+        elif op == "filter_desc_incl_substrs":
+            if not params:
+                return "No param provided", 400
+            rss_text_or_res = download_feed(url, request.headers)
+            if isinstance(rss_text_or_res, str):
+                return Response(filter_by_description_including_substrings(rss_text_or_res, params), mimetype='application/xml')
             return rss_text_or_res
         elif op == "filter_desc_excl_substrs":
             if not params:

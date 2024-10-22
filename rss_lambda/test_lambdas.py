@@ -3,6 +3,7 @@ from typing import List
 from .lambdas import \
     filter_by_title_including_substrings,\
     filter_by_title_excluding_substrings,\
+    filter_by_description_including_substrings,\
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
 from .test_utils import nitter_rss20_response
@@ -75,6 +76,18 @@ class LambdasTestCase(unittest.TestCase):
             filter_by_title_excluding_substrings(rss_text, ['EXCLUDE ME']),
             _youtube_atom_response([
                 'title 1',
+            ])
+        )
+
+    def test_filter_by_description_including_substrings(self):
+        rss_text = nitter_rss20_response([
+            '<p>some random text</p>',
+            '<p>also some random texts but INCLUDE ME hahaha</p>',
+        ])
+        self.assertEqual(
+            filter_by_description_including_substrings(rss_text, ['INCLUDE ME']),
+            nitter_rss20_response([
+                '<p>also some random texts but INCLUDE ME hahaha</p>',
             ])
         )
 
