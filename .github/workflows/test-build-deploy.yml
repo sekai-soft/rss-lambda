@@ -135,16 +135,3 @@ jobs:
       - name: Pull and restart latest container
         run: |
           ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@ktcorp" "cd /home/ubuntu/rss-lambda && docker compose pull && docker compose up -d"
-
-  notify:
-    runs-on: ubuntu-latest
-    needs:
-      - merge
-      - deploy
-    if: github.event_name == 'push'
-    steps:
-      - name: Send a Discord notification
-        uses: nobrayner/discord-webhook@v1
-        with:
-          github-token: ${{ secrets.github_token }}
-          discord-webhook: ${{ secrets.DISCORD_WEBHOOK }}
