@@ -15,6 +15,13 @@
 	"postCreateCommand": "pip3 install --user -r requirements.txt",
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"pcbowers.alpine-intellisense"
+			]
+		}
 	}
 
 	// Configure tool-specific properties.

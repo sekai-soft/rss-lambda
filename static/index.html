@@ -16,6 +16,7 @@
       isValidUrl: false,
       op: 'null',
       shouldShowParamsInput: false,
+      placeholder: 'Keyword',
       params: ['Keyword1'],
       newParam: '',
       resUrl: ''
@@ -40,6 +41,20 @@
           shouldShowParamsInput = isValidUrl && op != 'null' && !op.startsWith('filter_desc_cont_img');
         }
       )
+      
+      // updates placeholder
+      $watch(
+        'op',
+        () => {
+          if (op == 'merger') {
+            placeholder = 'Feed URL';
+            params = ['https://example.com/rss2'];
+          } else {
+            placeholder = 'Keyword';
+            params = ['Keyword1'];
+          }
+        }
+      );
 
       // updates resUrl
       $watch(
@@ -67,6 +82,12 @@
             }
             imageRecogUrlObj.searchParams.append('class_id', class_id);
             resUrl = imageRecogUrlObj.href;
+          } else if (op === 'merger') {
+            const rssMergerObj = new URL(window.location.protocol + '//' + window.location.host + '/rss_merger');
+            for (const url of [feedUrl, ...params]) {
+              rssMergerObj.searchParams.append('url', encodeURI(url));
+            }
+            resUrl = rssMergerObj.href;
           } else {
             urlObj.searchParams.append('url', encodeURI(feedUrl));
             urlObj.searchParams.append('op', op);
@@ -93,19 +114,22 @@
           Select an operation
         </option>
         <option value="filter_title_incl_substrs">
-          Title should include keywords
+          Title should include any of keyword
         </option>
         <option value="filter_title_excl_substrs">
-          Title should exclude keywords
+          Title should exclude any of keyword
         </option>
         <option value="filter_desc_incl_substrs">
-          Content should include keywords
+          Content should include any of keyword
         </option>
         <option value="filter_desc_excl_substrs">
-          Content should exclude keywords
+          Content should exclude any of keyword
         </option>
         <option value="filter_desc_cont_img">
           Content should contain images
+        </option>
+        <option value="merger">
+          Merge with other feeds
         </option>
         <option value="filter_desc_cont_img_human">
           (BETA) Content should contain human images 👩
@@ -129,7 +153,7 @@
     <br x-show="shouldShowParamsInput">
     <input
       type="text"
-      placeholder="Keyword"
+      x-bind:placeholder="placeholder"
       x-model="newParam"
       x-show="shouldShowParamsInput && params.length < 50"
       class="short-input"
