@@ -38,6 +38,8 @@ def _filter_by_description_including_substrings(e: etree.Element, root_nsmap: Di
     if description_e is None:
         return e
     description = description_e.text
+    if description is None:
+        return e
     for substr in included_substrings:
         if substr in description:
             return e
@@ -51,6 +53,8 @@ def _filter_by_description_excluding_substrings(e: etree.Element, root_nsmap: Di
     if description_e is None:
         return e
     description = description_e.text
+    if description is None:
+        return e
     for substr in excluded_substrings:
         if substr in description:
             return None
