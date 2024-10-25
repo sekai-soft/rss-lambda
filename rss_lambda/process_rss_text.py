@@ -14,7 +14,8 @@ class ParsedRssText:
     parent: etree.Element
     items: List[etree.Element]
 
-def process_rss_text(rss_text: str, processor: Callable[[ParsedRssText], None]) -> str:
+
+def parse_rss_text(rss_text: str) -> ParsedRssText:
     # Determine if it's a valid and supported feed
     feed = feedparser.parse(rss_text)
     if feed.bozo != 0:
@@ -33,14 +34,22 @@ def process_rss_text(rss_text: str, processor: Callable[[ParsedRssText], None]) 
         items = parent.findall('{http://www.w3.org/2005/Atom}entry')
     else:
         raise RSSLambdaError(f"Escaped unsupported feed version: {feed.version}")
-    
-    processor(ParsedRssText(
+
+    return ParsedRssText(
         root=root,
         parent=parent,
-        items=items))
+        items=items)
 
+
+def wrap_items_to_rss_text(rss_text: str, parsed_rss_text: ParsedRssText) -> str:
     # Return processed feed
     if xml_declaration in rss_text:
-        return xml_declaration + '\n' + etree.tostring(root, encoding='unicode')
+        return xml_declaration + '\n' + etree.tostring(parsed_rss_text.root, encoding='unicode')
     else:
-        return etree.tostring(root, encoding='unicode')
+        return etree.tostring(parsed_rss_text.root, encoding='unicode')
+
+
+def process_rss_text(rss_text: str, processor: Callable[[ParsedRssText], None]) -> str:
+    parsed_rss_text = parse_rss_text(rss_text)
+    processor(parsed_rss_text)
+    return wrap_items_to_rss_text(rss_text, parsed_rss_text)

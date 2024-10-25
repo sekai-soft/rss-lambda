@@ -14,6 +14,7 @@ from rss_lambda.rss_lambda_error import RSSLambdaError
 from rss_lambda.llava import is_llava_available
 from rss_lambda.rss_image_gender import rss_image_gender
 from rss_lambda.rss_image_recognition_tf import rss_image_recognition_tf
+from rss_lambda.rss_merger import rss_merger
 
 
 if os.getenv('SENTRY_DSN'):
@@ -170,6 +171,31 @@ def _rss():
             return rss_text_or_res
         else:
             return f"Unknown op {op}", 400
+    except RSSLambdaError as e:
+        return e.message, 500
+
+
+@app.route("/rss_merger")
+def _rss_merger():
+    # parse urls
+    urls = request.args.getlist('url')
+    if not urls:
+        return "No url provided", 400
+    if len(urls) == 1:
+        return "At least two urls are required", 400
+    urls = [unquote(url) for url in urls]
+    for url in urls:
+        parsed_url = urlparse(url)
+        if not all([parsed_url.scheme, parsed_url.netloc]):
+            return "Invalid url", 400
+
+    rss_texts = [download_feed(url, request.headers) for url in urls]
+    for rss_text_or_res in rss_texts:
+        if not isinstance(rss_text_or_res, str):
+            return rss_text_or_res
+
+    try:
+        return Response(rss_merger(rss_texts), mimetype='application/xml')
     except RSSLambdaError as e:
         return e.message, 500
 
