@@ -11,21 +11,22 @@ def get_guid(item) -> Optional[str]:
 
 def rss_merger(rss_texts: List[str]) -> str:
     parsed_rss_texts = list(map(parse_rss_text, rss_texts))
-    first_parsed_rss_text = parsed_rss_texts[0]
 
+    final_items = []
     appeared_guids = set()
-    for item in first_parsed_rss_text.items:
-        guid = get_guid(item)
-        if guid is not None:
-            appeared_guids.add(guid)
-
-    for parsed_rss_text in parsed_rss_texts[1:]:
+    for parsed_rss_text in parsed_rss_texts:
         for item in parsed_rss_text.items:
             guid = get_guid(item)
             if guid is None:
-                first_parsed_rss_text.parent.append(item)
+                final_items.append(item)
             elif guid not in appeared_guids:
-                first_parsed_rss_text.parent.append(item)
+                final_items.append(item)
                 appeared_guids.add(guid)
+
+    first_parsed_rss_text = parsed_rss_texts[0]
+    for item in first_parsed_rss_text.items:
+        first_parsed_rss_text.parent.remove(item)
+    for item in final_items:
+        first_parsed_rss_text.parent.append(item)
 
     return wrap_items_to_rss_text(rss_texts[0], first_parsed_rss_text)
