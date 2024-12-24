@@ -4,15 +4,15 @@ import sentry_sdk
 from typing import Union
 from flask import Flask, request, Response, send_from_directory, send_file
 from urllib.parse import unquote, urlparse
-from rss_lambda.lambdas import \
+from rss_lambda.simple_filters.simple_filters import \
     filter_by_title_including_substrings,\
     filter_by_title_excluding_substrings,\
     filter_by_description_including_substrings,\
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
-from rss_lambda.rss_lambda_error import RSSLambdaError
-from rss_lambda.rss_image_recognition_tf import rss_image_recognition_tf
-from rss_lambda.rss_merger import rss_merger
+from rss_lambda.utils.rss_lambda_error import RSSLambdaError
+from rss_lambda.image_recog.image_recog import image_recog
+from rss_lambda.merger.merger import merger
 
 
 if os.getenv('SENTRY_DSN'):
@@ -71,7 +71,7 @@ def _rss_image_recog():
     class_id = int(class_id)
 
     try:
-        return Response(rss_image_recognition_tf(rss_text_or_res, class_id, url), mimetype='application/xml')
+        return Response(image_recog(rss_text_or_res, class_id, url), mimetype='application/xml')
     except RSSLambdaError as e:
         return e.message, 500
 
@@ -157,7 +157,7 @@ def _rss_merger():
             return rss_text_or_res
 
     try:
-        return Response(rss_merger(rss_texts), mimetype='application/xml')
+        return Response(merger(rss_texts), mimetype='application/xml')
     except RSSLambdaError as e:
         return e.message, 500
 

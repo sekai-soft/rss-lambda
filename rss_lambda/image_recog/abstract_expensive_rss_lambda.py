@@ -6,7 +6,7 @@ import datetime
 from typing import Any, List
 from multiprocessing import Process
 from lxml import etree
-from .process_rss_text import process_rss_text, ParsedRssText
+from ..utils.process_rss_text import process_rss_text, ParsedRssText
 
 stale_cache_threshold_seconds = 5 * 60  # 5 minutes
 

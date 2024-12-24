@@ -1,6 +1,6 @@
 import unittest
 from typing import List
-from .lambdas import \
+from .simple_filters.simple_filters import \
     filter_by_title_including_substrings,\
     filter_by_title_excluding_substrings,\
     filter_by_description_including_substrings,\

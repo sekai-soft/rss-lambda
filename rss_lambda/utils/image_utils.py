@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 def is_cdata(s: str) -> bool:
     return s.startswith('<![CDATA[') and s.endswith(']]>')
 
-def _extract_images_from_description(e: etree.Element, root_nsmap: Dict) -> List[etree.Element]:
+def extract_images_from_description(e: etree.Element, root_nsmap: Dict) -> List[etree.Element]:
     description_e = e.find('description', root_nsmap)
     if description_e is None:
         return []
@@ -25,7 +25,7 @@ def _extract_images_from_description(e: etree.Element, root_nsmap: Dict) -> List
         logging.error(f'failed to parse description text: {description_e.text}, error: {ex}')
         return []
 
-def _download_image(src: str) -> Optional[str]:
+def download_image(src: str) -> Optional[str]:
     # Parse the URL to get the file extension
     parsed_url = urlparse(src)
     file_extension = os.path.splitext(parsed_url.path)[1]
@@ -43,7 +43,7 @@ def _download_image(src: str) -> Optional[str]:
             logging.error(f"failed to download image from {src}: HTTP status {response.status_code}")
             return None
 
-def _create_item_element_with_image(img_src: str, item_element_tag: str, original_link: Optional[str]=None) -> etree.Element:
+def create_item_element_with_image(img_src: str, item_element_tag: str, original_link: Optional[str]=None) -> etree.Element:
     item_element = etree.Element(item_element_tag)
 
     title_element = etree.Element('title')
@@ -64,7 +64,7 @@ def _create_item_element_with_image(img_src: str, item_element_tag: str, origina
 
     return item_element
 
-def _extract_link(e: etree.Element, root_nsmap: Dict) -> Optional[str]:
+def extract_link(e: etree.Element, root_nsmap: Dict) -> Optional[str]:
     link_e = e.find('link', root_nsmap)
     if link_e is None:
         return None

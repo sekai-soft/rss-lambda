@@ -1,6 +1,6 @@
 import unittest
 from typing import List, Tuple
-from .rss_merger import rss_merger
+from .merger.merger import merger
 
 
 def _nyt_rss_response(guid_and_pub_dates: List[Tuple[str, str]]):
@@ -35,7 +35,7 @@ class RssMergerTestCase(unittest.TestCase):
             ('https://nyt.example.com/trump1.html', '2024-01-06T07:07:14+0000'),
         ])
         self.assertEqual(
-            rss_merger([rss_text_1, rss_text_2]),
+            merger([rss_text_1, rss_text_2]),
             _nyt_rss_response([
                 ('https://nyt.example.com/trump1.html', '2024-01-06T07:07:14+0000'),
                 ('https://nyt.example.com/harris1.html', '2024-01-05T07:07:14+0000'),

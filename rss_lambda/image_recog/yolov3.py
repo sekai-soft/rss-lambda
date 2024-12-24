@@ -3,7 +3,7 @@ import logging
 import time
 import requests
 import json
-from .rss_image_utils import _download_image
+from ..utils.image_utils import download_image
 from .file_cache import file_cache
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
@@ -14,11 +14,11 @@ size = 320
 
 
 @file_cache(verbose=True)
-def yolov3_tf(image_url: str, desired_class_id: int) -> bool:
+def yolov3(image_url: str, desired_class_id: int) -> bool:
     start_time = time.time()
 
     # Downlaod image
-    image_path = _download_image(image_url)
+    image_path = download_image(image_url)
     if image_path is None:
         logging.error(f"failed to download image from {image.get('src')}")
         return False
