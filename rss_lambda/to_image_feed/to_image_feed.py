@@ -3,6 +3,8 @@ from lxml import etree
 from ..utils.process_rss_text import ParsedRssText, process_rss_text
 from ..utils.image_utils import extract_images_from_description
 
+MAX_IMAGES_PER_ITEM = 4
+
 def to_image_feed(rss_text: str) -> str:
     def processor(parsed_rss_text: ParsedRssText):
         root = parsed_rss_text.root
@@ -28,7 +30,7 @@ def to_image_feed(rss_text: str) -> str:
             images = extract_images_from_description(item, root.nsmap)
             if not images:
                 return
-            for image in images:
+            for image in images[: MAX_IMAGES_PER_ITEM]:
                 handle_image(item, image)
 
         for item in items:

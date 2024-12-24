@@ -14,6 +14,7 @@ class ToImageFeedTestCase(unittest.TestCase):
             '<p>also some random texts<br>but without images haha 2222</p> ',
             '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic1.jpg" /><img src="https://nitter.example.com/twitter_handle/pic/pic2.jpg" />',
             '<p>also some random texts but with images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic3.jpg" />',
+            '<p>also some random texts but with a lot of images hahahaha</p><img src="https://nitter.example.com/twitter_handle/pic/pic4.jpg" /><img src="https://nitter.example.com/twitter_handle/pic/pic5.jpg" /><img src="https://nitter.example.com/twitter_handle/pic/pic6.jpg" /><img src="https://nitter.example.com/twitter_handle/pic/pic7.jpg" /><img src="https://nitter.example.com/twitter_handle/pic/pic8.jpg" />',
         ])
         self.assertEqual(
             to_image_feed(rss_text),
@@ -21,5 +22,9 @@ class ToImageFeedTestCase(unittest.TestCase):
                 '<img src="https://nitter.example.com/twitter_handle/pic/pic1.jpg"></img>',
                 '<img src="https://nitter.example.com/twitter_handle/pic/pic2.jpg"></img>',
                 '<img src="https://nitter.example.com/twitter_handle/pic/pic3.jpg"></img>',
+                '<img src="https://nitter.example.com/twitter_handle/pic/pic4.jpg"></img>',
+                '<img src="https://nitter.example.com/twitter_handle/pic/pic5.jpg"></img>',
+                '<img src="https://nitter.example.com/twitter_handle/pic/pic6.jpg"></img>',
+                '<img src="https://nitter.example.com/twitter_handle/pic/pic7.jpg"></img>',
             ])
         )
