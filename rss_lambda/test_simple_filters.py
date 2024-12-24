@@ -51,7 +51,7 @@ def _youtube_atom_response(titles: List[str]):
 </feed>"""
 
 
-class LambdasTestCase(unittest.TestCase):
+class SimpleFiltersTestCase(unittest.TestCase):
     def setUp(self):
         self.maxDiff = None
 

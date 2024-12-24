@@ -38,7 +38,7 @@
       $watch(
         'isValidUrl, op',
         () => {
-          shouldShowParamsInput = isValidUrl && op != 'null' && !op.startsWith('filter_desc_cont_img');
+          shouldShowParamsInput = isValidUrl && op != 'null' && !op.startsWith('filter_desc_cont_img') && op != 'to_image_feed';
         }
       )
       
@@ -88,6 +88,10 @@
               rssMergerObj.searchParams.append('url', encodeURI(url));
             }
             resUrl = rssMergerObj.href;
+          } else if (op === 'to_image_feed') {
+            const toImageFeedObj = new URL(window.location.protocol + '//' + window.location.host + '/to_image_feed');
+            toImageFeedObj.searchParams.append('url', encodeURI(feedUrl));
+            resUrl = toImageFeedObj.href;
           } else {
             urlObj.searchParams.append('url', encodeURI(feedUrl));
             urlObj.searchParams.append('op', op);
@@ -130,6 +134,9 @@
         </option>
         <option value="merger">
           Merge with other feeds
+        </option>
+        <option value="to_image_feed">
+          Convert to an image only feed
         </option>
         <option value="filter_desc_cont_img_human">
           (BETA) Content should contain human images 👩

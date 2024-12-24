@@ -23,6 +23,7 @@ Transformations include
 * Filter a rss feed by excluding entries with certain keywords in their contents
 * Filter a rss feed by only including entries with image(s) in their contents
 * Merge with other feeds
+* Convert a feed to an image only feed
 * (BETA) Filter a rss feed by only including entries with human image(s) in their contents
 * (BETA) Filter a rss feed by only including entries with cat image(s) in their contents
 * (BETA) Filter a rss feed by only including entries with dog image(s) in their contents
