@@ -1,4 +1,5 @@
 import copy
+import hashlib
 from lxml import etree
 from ..utils.process_rss_text import ParsedRssText, process_rss_text
 from ..utils.image_utils import extract_images_from_description
@@ -17,6 +18,13 @@ def to_image_feed(rss_text: str) -> str:
             new_item = copy.deepcopy(item)
             new_description = new_item.find('description', root.nsmap)
             new_description.text = etree.CDATA(f'<img src="{image_link}"></img>')
+
+            sha256_hash = hashlib.sha256()
+            sha256_hash.update(image_link.encode('utf-8'))
+            hashed_image_link = sha256_hash.hexdigest()
+
+            new_guid = new_item.find('guid', root.nsmap)
+            new_guid.text += f"#{hashed_image_link}"
 
             parent.append(new_item)
 
