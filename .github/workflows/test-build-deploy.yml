@@ -45,7 +45,9 @@ jobs:
         with:
           context: .
           platforms: linux/amd64
-          tags: ghcr.io/${{ github.repository }}:latest-amd64
+          tags: |
+            ghcr.io/${{ github.repository }}:latest-amd64
+            ghcr.io/${{ github.repository }}:${{ github.sha }}-amd64
           push: true
       - name: Export digest
         run: |
@@ -79,7 +81,9 @@ jobs:
         with:
           context: .
           platforms: linux/arm64
-          tags: ghcr.io/${{ github.repository }}:latest-arm64
+          tags: |
+            ghcr.io/${{ github.repository }}:latest-arm64
+            ghcr.io/${{ github.repository }}:${{ github.sha }}-arm64
           push: true
       - name: Export digest
         run: |
