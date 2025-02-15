@@ -18,8 +18,8 @@ class ParsedRssText:
 def parse_rss_text(rss_text: str) -> ParsedRssText:
     # Determine if it's a valid and supported feed
     feed = feedparser.parse(rss_text)
-    if feed.bozo != 0:
-        raise RSSLambdaError(f"Failed to parse the feed: {feed.bozo_exception}")
+    if not feed.entries:
+        raise RSSLambdaError(f"Did not detect any entries in feed")
     if feed.version not in supported_feed_versions:
         raise RSSLambdaError(f"Unsupported feed version: {feed.version}")
 
