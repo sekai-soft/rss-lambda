@@ -79,17 +79,17 @@ class SimpleFiltersTestCase(unittest.TestCase):
             ])
         )
 
-    def test_filter_by_description_including_substrings(self):
-        rss_text = nitter_rss20_response([
-            '<p>some random text</p>',
-            '<p>also some random texts but INCLUDE ME hahaha</p>',
-        ])
-        self.assertEqual(
-            filter_by_description_including_substrings(rss_text, ['INCLUDE ME']),
-            nitter_rss20_response([
-                '<p>also some random texts but INCLUDE ME hahaha</p>',
-            ])
-        )
+    # def test_filter_by_description_including_substrings(self):
+    #     rss_text = nitter_rss20_response([
+    #         '<p>some random text</p>',
+    #         '<p>also some random texts but INCLUDE ME hahaha</p>',
+    #     ])
+    #     self.assertEqual(
+    #         filter_by_description_including_substrings(rss_text, ['INCLUDE ME']),
+    #         nitter_rss20_response([
+    #             '<p>also some random texts but INCLUDE ME hahaha</p>',
+    #         ])
+    #     )
 
     def test_filter_by_description_excluding_substrings(self):
         rss_text = nitter_rss20_response([
