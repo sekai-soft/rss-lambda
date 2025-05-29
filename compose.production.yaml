@@ -1,0 +1,29 @@
+name: rss-lambda
+services:
+  rss-lambda:
+    image: ghcr.io/sekai-soft/rss-lambda:latest
+    container_name: rss-lambda
+    restart: unless-stopped
+    volumes:
+      - ./blobs:/app/blobs
+      - ./cache:/app/cache
+      - ./file_cache:/app/file_cache
+    environment:
+      - TFSERVING_ROOT=http://tfserving:8501
+    env_file:
+      - env
+  tfserving:
+    image: bitnami/tensorflow-serving:latest
+    container_name: tfserving
+    restart: unless-stopped
+    volumes:
+      - ./blobs/yolov3:/bitnami/model-data
+    environment:
+      - TENSORFLOW_SERVING_MODEL_NAME=yolov3
+  cloudflared:
+    image: cloudflare/cloudflared
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run rss-lambda
+    env_file:
+      - env

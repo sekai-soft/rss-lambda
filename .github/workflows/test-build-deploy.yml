@@ -131,11 +131,16 @@ jobs:
     steps:
       - name: Setup Tailscale
         id: tailscale
-        uses: tailscale/github-action@main
+        uses: tailscale/github-action@v2
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ops
-      - name: Pull and restart latest container
+      - name: Pull and restart container
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@ktcorp" "cd /home/ubuntu/rss-lambda && docker compose pull && docker compose up -d"
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "nixos@gibraltar" \
+            "mkdir -p /home/nixos/rss-lambda && \
+             wget -O /home/nixos/rss-lambda/compose.yaml https://raw.githubusercontent.com/sekai-soft/rss-lambda/${{ github.sha }}/compose.production.yaml && \
+             sed -i 's|ghcr.io/sekai-soft/rss-lambda:latest|ghcr.io/sekai-soft/rss-lambda:${{ github.sha }}|g' /home/nixos/rss-lambda/compose.yaml && \
+             docker compose -f /home/nixos/rss-lambda/compose.yaml pull rss-lambda && \
+             docker compose -f /home/nixos/rss-lambda/compose.yaml up -d"
