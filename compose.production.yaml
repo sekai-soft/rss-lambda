@@ -14,7 +14,6 @@ services:
       - env
   tfserving:
     image: bitnami/tensorflow-serving:latest
-    container_name: tfserving
     restart: unless-stopped
     volumes:
       - ./blobs/yolov3:/bitnami/model-data
@@ -22,7 +21,6 @@ services:
       - TENSORFLOW_SERVING_MODEL_NAME=yolov3
   cloudflared:
     image: cloudflare/cloudflared
-    container_name: cloudflared
     restart: unless-stopped
     command: tunnel run rss-lambda
     env_file:
