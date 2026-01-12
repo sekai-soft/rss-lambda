@@ -12,6 +12,7 @@ services:
       - TFSERVING_ROOT=http://tfserving:8501
     env_file:
       - env
+    network_mode: service:rss-lambda-ts
   tfserving:
     image: bitnami/tensorflow-serving:latest
     restart: unless-stopped
@@ -19,9 +20,23 @@ services:
       - ./blobs/yolov3:/bitnami/model-data
     environment:
       - TENSORFLOW_SERVING_MODEL_NAME=yolov3
-  cloudflared:
-    image: cloudflare/cloudflared
+  rss-lambda-ts:
+    image: tailscale/tailscale:latest
     restart: unless-stopped
-    command: tunnel run rss-lambda
+    hostname: rss-lambda
+    environment:
+      - TS_EXTRA_ARGS=--advertise-tags=tag:server
+      - TS_STATE_DIR=/var/lib/tailscale
     env_file:
-      - env
+      - /home/nixos/env-tailscale
+    volumes:
+      - rss-lambda-ts:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+volumnes:
+  rss-lambda-ts:

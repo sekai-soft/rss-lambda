@@ -145,4 +145,4 @@ jobs:
              wget -O /home/nixos/rss-lambda/compose.yaml https://raw.githubusercontent.com/sekai-soft/rss-lambda/${{ github.sha }}/compose.production.yaml && \
              sed -i 's|ghcr.io/sekai-soft/rss-lambda:latest|ghcr.io/sekai-soft/rss-lambda:${{ github.sha }}|g' /home/nixos/rss-lambda/compose.yaml && \
              docker compose -f /home/nixos/rss-lambda/compose.yaml pull rss-lambda && \
-             docker compose -f /home/nixos/rss-lambda/compose.yaml up -d"
+             docker compose -f /home/nixos/rss-lambda/compose.yaml up -d --remove-orphans"
