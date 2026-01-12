@@ -38,5 +38,5 @@ services:
     labels:
       - com.centurylinklabs.watchtower.enable=true
 
-volumnes:
+volumes:
   rss-lambda-ts:
