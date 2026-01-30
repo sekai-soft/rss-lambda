@@ -1,8 +1,0 @@
-Flask==3.0.0
-feedparser==6.0.11
-requests==2.31.0
-lxml==5.0.0
-beautifulsoup4==4.12.3
-sentry-sdk[flask]==1.43.0
-pillow==11.0.0
-tensorflow==2.17.0
