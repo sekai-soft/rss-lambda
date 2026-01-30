@@ -46,4 +46,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 WORKDIR /app
 
 # Run uwsgi.ini when the container launches
-CMD ["bash", "-c", "flask translate compile && flask digest compile && PORT=\"${PORT:=5000}\" && uwsgi --ini uwsgi.ini --http :${PORT}"]
+CMD ["bash", "-c", "PORT=\"${PORT:=5000}\" && uwsgi --ini uwsgi.ini --http :${PORT}"]

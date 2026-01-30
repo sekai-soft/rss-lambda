@@ -11,7 +11,6 @@ from rss_lambda.simple_filters.simple_filters import \
     filter_by_description_excluding_substrings,\
     filter_by_description_containing_image
 from rss_lambda.utils.rss_lambda_error import RSSLambdaError
-from rss_lambda.image_recog.image_recog import image_recog
 from rss_lambda.merger.merger import merger
 from rss_lambda.to_image_feed.to_image_feed import to_image_feed
 
@@ -101,39 +100,6 @@ def _rss():
             return rss_text_or_res
         else:
             return f"Unknown op {op}", 400
-    except RSSLambdaError as e:
-        return e.message, 500
-
-
-@app.route("/rss_image_recog")
-def _rss_image_recog():
-    # parse url
-    url = request.args.get('url', default=None)
-    if not url:
-        return "No url provided", 400
-    url = unquote(url)
-    parsed_url = urlparse(url)
-    if not all([parsed_url.scheme, parsed_url.netloc]):
-        return "Invalid url", 400
-    rss_text_or_res = download_feed(url, request.headers)
-    if not isinstance(rss_text_or_res, str):
-        return rss_text_or_res
-
-    # parse class_id
-    class_id = request.args.get('class_id', default=None)
-    if not class_id:
-        return "No class_id provided", 400
-    
-    # Hack for Reeder (iOS)
-    if class_id.endswith("/rss"):
-        class_id = class_id[:-4]
-    if class_id.endswith("/feed"):
-        class_id = class_id[:-5]
-
-    class_id = int(class_id)
-
-    try:
-        return Response(image_recog(rss_text_or_res, class_id, url), mimetype='application/xml')
     except RSSLambdaError as e:
         return e.message, 500
 
