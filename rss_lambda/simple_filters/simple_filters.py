@@ -37,9 +37,10 @@ def _filter_by_description_including_substrings(e: etree.Element, root_nsmap: Di
     description_e = e.find('description', root_nsmap)
 
     media_description_e = None
-    media_group_e = e.find('media:group', root_nsmap)
-    if media_group_e is not None:
-        media_description_e = media_group_e.find('media:description', root_nsmap)
+    if 'media' in root_nsmap:
+        media_group_e = e.find('media:group', root_nsmap)
+        if media_group_e is not None:
+            media_description_e = media_group_e.find('media:description', root_nsmap)
 
     description = None
     if media_description_e is not None:
@@ -59,9 +60,19 @@ def filter_by_description_including_substrings(rss_text: str, included_substring
 
 def _filter_by_description_excluding_substrings(e: etree.Element, root_nsmap: Dict, excluded_substrings: List[str]) -> Optional[etree.Element]:
     description_e = e.find('description', root_nsmap)
-    if description_e is None:
-        return e
-    description = description_e.text
+
+    media_description_e = None
+    if 'media' in root_nsmap:
+        media_group_e = e.find('media:group', root_nsmap)
+        if media_group_e is not None:
+            media_description_e = media_group_e.find('media:description', root_nsmap)
+
+    description = None
+    if media_description_e is not None:
+        description = media_description_e.text
+    elif description_e is not None:
+        description = description_e.text
+
     if description is None:
         return e
     for substr in excluded_substrings:
