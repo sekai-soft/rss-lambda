@@ -24,7 +24,8 @@ def parse_rss_text(rss_text: str) -> ParsedRssText:
         raise RSSLambdaError(f"Unsupported feed version: {feed.version}")
 
     # Parse the feed and find the parent element of the items or entries
-    lxml_parser = etree.XMLParser(strip_cdata=False)
+    # Use recover=True to handle undefined HTML entities like &nbsp;
+    lxml_parser = etree.XMLParser(strip_cdata=False, recover=True)
     root = etree.fromstring(rss_text.encode('utf-8'), parser=lxml_parser)
     if feed.version == 'rss20':
         parent = root.find('./channel')
