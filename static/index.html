@@ -38,7 +38,7 @@
       $watch(
         'isValidUrl, op',
         () => {
-          shouldShowParamsInput = isValidUrl && op != 'null' && !op.startsWith('filter_desc_cont_img') && op != 'to_image_feed';
+          shouldShowParamsInput = isValidUrl && op != 'null' && op != 'filter_desc_cont_img' && op != 'to_image_feed';
         }
       )
       
@@ -68,20 +68,6 @@
             urlObj.searchParams.append('url', encodeURI(feedUrl));
             urlObj.searchParams.append('op', op);
             resUrl = urlObj.href;
-          } else if (op.startsWith('filter_desc_cont_img')) {
-            const imageRecogUrlObj = new URL(window.location.protocol + '//' + window.location.host + '/rss_image_recog');
-            imageRecogUrlObj.searchParams.append('url', encodeURI(feedUrl));
-            // from https://github.com/LEGO999/YOLOV3-TF2/blob/master/classes.txt
-            let class_id = 0;
-            if (op == 'filter_desc_cont_img_human') {
-              class_id = 0;
-            } else if (op == 'filter_desc_cont_img_dog') {
-              class_id = 16;
-            } else if (op == 'filter_desc_cont_img_cat') {
-              class_id = 15;
-            }
-            imageRecogUrlObj.searchParams.append('class_id', class_id);
-            resUrl = imageRecogUrlObj.href;
           } else if (op === 'merger') {
             const rssMergerObj = new URL(window.location.protocol + '//' + window.location.host + '/rss_merger');
             for (const url of [feedUrl, ...params]) {
@@ -137,15 +123,6 @@
         </option>
         <option value="to_image_feed">
           Convert to an image only feed
-        </option>
-        <option value="filter_desc_cont_img_human">
-          (BETA) Content should contain human images 👩
-        </option>
-        <option value="filter_desc_cont_img_dog">
-          (BETA) Content should contain dog images 🐶
-        </option>
-        <option value="filter_desc_cont_img_cat">
-          (BETA) Content should contain cat images 🐈
         </option>
       </select>
     </p>
