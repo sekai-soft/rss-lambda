@@ -129,6 +129,10 @@ input {
     width: 75%;
 }
 
+.short-input {
+    width: 50%;
+}
+
 input::placeholder {
     color: #999999;
 }
