@@ -16,18 +16,18 @@
       isValidUrl: false,
       op: 'null',
       shouldShowParamsInput: false,
-      placeholder: 'Keyword',
-      params: ['Keyword1'],
+      placeholder: 'Enter a keyword here, then ↵',
+      params: [],
       newParam: '',
       resUrl: ''
     }"
     x-init="$watch('op', () => {
       if (op == 'merger') {
-        placeholder = 'Feed URL';
+        placeholder = 'Enter a feed URL here, then ↵';
         params = ['https://example.com/rss2'];
       } else {
-        placeholder = 'Keyword';
-        params = ['Keyword1'];
+        placeholder = 'Enter a keyword here, then ↵';
+        params = [];
       }
     })"
     x-effect="
@@ -116,7 +116,6 @@
       x-bind:placeholder="placeholder"
       x-model="newParam"
       x-show="shouldShowParamsInput && params.length < 50"
-      class="short-input"
       @keydown.enter="if (!newParam || params.includes(newParam)) return; params = [...params, newParam]; newParam = ''"
     >
     <p x-show="isValidUrl && resUrl">3. This is the feed URL after operation</p>
