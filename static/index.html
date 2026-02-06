@@ -21,74 +21,50 @@
       newParam: '',
       resUrl: ''
     }"
-    x-init="() => {
+    x-init="$watch('op', () => {
+      if (op == 'merger') {
+        placeholder = 'Feed URL';
+        params = ['https://example.com/rss2'];
+      } else {
+        placeholder = 'Keyword';
+        params = ['Keyword1'];
+      }
+    })"
+    x-effect="
       // updates isValidUrl
-      $watch(
-        'feedUrl',
-        () => {
-          try {
-            new URL(feedUrl); isValidUrl = true;
-          } catch (_) {
-            isValidUrl = feedUrl == 't';
-          }
-        }
-      );
+      isValidUrl = (() => { try { new URL(feedUrl); return true; } catch (_) { return feedUrl == 't'; } })();
 
       // updates shouldShowParamsInput
-      $watch(
-        'isValidUrl, op',
-        () => {
-          shouldShowParamsInput = isValidUrl && op != 'null' && op != 'filter_desc_cont_img' && op != 'to_image_feed';
-        }
-      )
-      
-      // updates placeholder
-      $watch(
-        'op',
-        () => {
-          if (op == 'merger') {
-            placeholder = 'Feed URL';
-            params = ['https://example.com/rss2'];
-          } else {
-            placeholder = 'Keyword';
-            params = ['Keyword1'];
-          }
-        }
-      );
+      shouldShowParamsInput = isValidUrl && op != 'null' && op != 'filter_desc_cont_img' && op != 'to_image_feed';
 
       // updates resUrl
-      $watch(
-        'feedUrl, op, params',
-        () => {
-          if (!isValidUrl) return;
-          const urlObj = new URL(window.location.protocol + '//' + window.location.host + '/rss');
-          if (op == 'null') {
-            resUrl = '';
-          } else if (op == 'filter_desc_cont_img') {
-            urlObj.searchParams.append('url', encodeURI(feedUrl));
-            urlObj.searchParams.append('op', op);
-            resUrl = urlObj.href;
-          } else if (op === 'merger') {
-            const rssMergerObj = new URL(window.location.protocol + '//' + window.location.host + '/rss_merger');
-            for (const url of [feedUrl, ...params]) {
-              rssMergerObj.searchParams.append('url', encodeURI(url));
-            }
-            resUrl = rssMergerObj.href;
-          } else if (op === 'to_image_feed') {
-            const toImageFeedObj = new URL(window.location.protocol + '//' + window.location.host + '/to_image_feed');
-            toImageFeedObj.searchParams.append('url', encodeURI(feedUrl));
-            resUrl = toImageFeedObj.href;
-          } else {
-            urlObj.searchParams.append('url', encodeURI(feedUrl));
-            urlObj.searchParams.append('op', op);
-            for (const param of params) {
-              urlObj.searchParams.append('param', param);
-            }
-            resUrl = urlObj.href;
-          }
+      if (!isValidUrl || op == 'null') {
+        resUrl = '';
+      } else if (op == 'filter_desc_cont_img') {
+        const urlObj = new URL(window.location.protocol + '//' + window.location.host + '/rss');
+        urlObj.searchParams.append('url', encodeURI(feedUrl));
+        urlObj.searchParams.append('op', op);
+        resUrl = urlObj.href;
+      } else if (op === 'merger') {
+        const rssMergerObj = new URL(window.location.protocol + '//' + window.location.host + '/rss_merger');
+        for (const url of [feedUrl, ...params]) {
+          rssMergerObj.searchParams.append('url', encodeURI(url));
         }
-      );
-    }"
+        resUrl = rssMergerObj.href;
+      } else if (op === 'to_image_feed') {
+        const toImageFeedObj = new URL(window.location.protocol + '//' + window.location.host + '/to_image_feed');
+        toImageFeedObj.searchParams.append('url', encodeURI(feedUrl));
+        resUrl = toImageFeedObj.href;
+      } else {
+        const urlObj = new URL(window.location.protocol + '//' + window.location.host + '/rss');
+        urlObj.searchParams.append('url', encodeURI(feedUrl));
+        urlObj.searchParams.append('op', op);
+        for (const param of params) {
+          urlObj.searchParams.append('param', param);
+        }
+        resUrl = urlObj.href;
+      }
+    "
   >   
     <p><img src="/static/icon.png" class="logo" /> RSS-lambda transforms RSS feeds without RSS client lock-in</p>
     <p>1. Enter feed URL</p>
