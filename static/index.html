@@ -19,17 +19,85 @@
       placeholder: 'Enter a keyword here, then ↵',
       params: [],
       newParam: '',
-      resUrl: ''
-    }"
-    x-init="$watch('op', () => {
-      if (op == 'merger') {
-        placeholder = 'Enter a feed URL here, then ↵';
-        params = [];
-      } else {
-        placeholder = 'Enter a keyword here, then ↵';
-        params = [];
+      resUrl: '',
+      isEditing: false,
+      parseEditUrl(inputUrl) {
+        try {
+          let urlObj;
+          let pathname;
+
+          // Handle relative paths like /rss?... or /rss_merger?... or /to_image_feed?...
+          if (inputUrl.startsWith('/rss') || inputUrl.startsWith('/rss_merger') || inputUrl.startsWith('/to_image_feed')) {
+            urlObj = new URL(inputUrl, window.location.origin);
+            pathname = urlObj.pathname;
+          } else {
+            urlObj = new URL(inputUrl);
+            pathname = urlObj.pathname;
+          }
+
+          // Check if it's a known RSS-lambda URL pattern
+          if (pathname === '/rss') {
+            const ogUrl = urlObj.searchParams.get('url');
+            const operation = urlObj.searchParams.get('op');
+            const paramValues = urlObj.searchParams.getAll('param');
+
+            if (ogUrl && operation) {
+              this.isEditing = true;
+              this.feedUrl = decodeURI(ogUrl);
+              this.op = operation;
+              this.params = paramValues;
+              if (operation === 'merger') {
+                this.placeholder = 'Enter a feed URL here, then ↵';
+              } else {
+                this.placeholder = 'Enter a keyword here, then ↵';
+              }
+              setTimeout(() => this.isEditing = false, 0);
+              return true;
+            }
+          } else if (pathname === '/rss_merger') {
+            const urls = urlObj.searchParams.getAll('url').map(u => decodeURI(u));
+            if (urls.length > 0) {
+              this.isEditing = true;
+              this.feedUrl = urls[0];
+              this.op = 'merger';
+              this.params = urls.slice(1);
+              this.placeholder = 'Enter a feed URL here, then ↵';
+              setTimeout(() => this.isEditing = false, 0);
+              return true;
+            }
+          } else if (pathname === '/to_image_feed') {
+            const ogUrl = urlObj.searchParams.get('url');
+            if (ogUrl) {
+              this.isEditing = true;
+              this.feedUrl = decodeURI(ogUrl);
+              this.op = 'to_image_feed';
+              this.params = [];
+              setTimeout(() => this.isEditing = false, 0);
+              return true;
+            }
+          }
+        } catch (e) {
+          // Not a valid URL for editing
+        }
+        return false;
       }
-    })"
+    }"
+    x-init="
+      $watch('feedUrl', (value) => {
+        if (isEditing) return;
+        parseEditUrl(value);
+      });
+      $watch('op', () => {
+        if (isEditing) return;
+        if (op == 'merger') {
+          placeholder = 'Enter a feed URL here, then ↵';
+          params = [];
+        } else {
+          placeholder = 'Enter a keyword here, then ↵';
+          params = [];
+        }
+      });
+    "
     x-effect="
       // updates isValidUrl
       isValidUrl = (() => { try { new URL(feedUrl); return true; } catch (_) { return feedUrl == 't'; } })();
@@ -69,7 +137,7 @@
     "
   >   
     <p><img src="/static/icon.png" class="logo" /> RSS-lambda transforms RSS feeds without RSS client lock-in</p>
-    <p>1. Enter feed URL</p>
+    <p>1. Enter feed URL (or enter a RSS-lambda URL to edit)</p>
     <input
       type="text"
       placeholder="https://example.com/rss"
