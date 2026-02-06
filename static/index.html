@@ -45,7 +45,7 @@
         urlObj.searchParams.append('url', encodeURI(feedUrl));
         urlObj.searchParams.append('op', op);
         resUrl = urlObj.href;
-      } else if (op === 'merger') {
+      } else if (op === 'merger' && params.length > 0) {
         const rssMergerObj = new URL(window.location.protocol + '//' + window.location.host + '/rss_merger');
         for (const url of [feedUrl, ...params]) {
           rssMergerObj.searchParams.append('url', encodeURI(url));
@@ -55,7 +55,7 @@
         const toImageFeedObj = new URL(window.location.protocol + '//' + window.location.host + '/to_image_feed');
         toImageFeedObj.searchParams.append('url', encodeURI(feedUrl));
         resUrl = toImageFeedObj.href;
-      } else {
+      } else if (params.length > 0) {
         const urlObj = new URL(window.location.protocol + '//' + window.location.host + '/rss');
         urlObj.searchParams.append('url', encodeURI(feedUrl));
         urlObj.searchParams.append('op', op);
@@ -63,6 +63,8 @@
           urlObj.searchParams.append('param', param);
         }
         resUrl = urlObj.href;
+      } else {
+        resUrl = '';
       }
     "
   >   
