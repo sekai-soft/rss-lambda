@@ -35,7 +35,7 @@ def download_feed(rss_url: str, headers) -> Union[str, Response]:
     try:
         res = requests.get(rss_url, headers={
             'User-Agent': headers.get('User-Agent', '')
-        })
+        }, timeout=15)
         if res.status_code >= 400 and res.status_code < 600:
             return Response(res.content, res.status_code)
         return res.text
