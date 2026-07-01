@@ -14,6 +14,8 @@ RSS-lambda is an application that perform transformations on the server-side ins
 
 There is an official server instance available at [rss-lambda.xyz](https://rss-lambda.xyz)
 
+> ⚠️ Rate limit: There is a 10 requests/hour/IP rate limit on the official server instance to help preserve server resources. If you need higher rate limits, please consider self-hosting.
+
 From the web UI, you can tell it what you want to do with the RSS feed, and it will generate a RSS feed URL after your specified transformation
 
 Transformations include
