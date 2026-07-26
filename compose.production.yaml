@@ -9,6 +9,7 @@ services:
     network_mode: service:rss-lambda-ts
   rss-lambda-ts:
     image: tailscale/tailscale:latest
+    container_name: rss-lambda-ts
     restart: unless-stopped
     hostname: rss-lambda
     environment:
