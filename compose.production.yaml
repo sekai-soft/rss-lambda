@@ -6,15 +6,34 @@ services:
     restart: unless-stopped
     env_file:
       - env
+    depends_on:
+      rss-lambda-ts:
+        condition: service_healthy
     network_mode: service:rss-lambda-ts
   rss-lambda-ts:
     image: tailscale/tailscale:latest
     container_name: rss-lambda-ts
     restart: unless-stopped
     hostname: rss-lambda
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "[ts] waiting for tailscale control-plane reachability..."
+        until nc -z -w 2 api.tailscale.com 443 >/dev/null 2>&1 && nc -z -w 2 controlplane.tailscale.com 443 >/dev/null 2>&1; do
+          sleep 2
+        done
+        echo "[ts] control-plane reachable, starting containerboot"
+        exec /usr/local/bin/containerboot
     environment:
       - TS_EXTRA_ARGS=--advertise-tags=tag:server
       - TS_STATE_DIR=/var/lib/tailscale
+    healthcheck:
+      test: ["CMD-SHELL", "tailscale status --json | grep -Eq '\"BackendState\": *\"Running\"'"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
     env_file:
       - /home/nixos/env-tailscale
     volumes:
