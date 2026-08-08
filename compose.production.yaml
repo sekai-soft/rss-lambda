@@ -35,7 +35,7 @@ services:
       retries: 20
       start_period: 5s
     env_file:
-      - /home/nixos/env-tailscale
+      - $HOME/env-tailscale
     volumes:
       - rss-lambda-ts:/var/lib/tailscale
       - /dev/net/tun:/dev/net/tun
