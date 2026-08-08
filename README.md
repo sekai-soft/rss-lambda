@@ -12,7 +12,7 @@ RSS-lambda is an application that perform transformations on the server-side ins
 
 ## Usage
 
-There is an official server instance available at [rss-lambda.xyz](https://rss-lambda.xyz)
+There is an official server instance available at [rss-lambda.ktachibana.party](https://rss-lambda.ktachibana.party)
 
 > ⚠️ Rate limit: There is a 10 requests/hour/IP rate limit on the official server instance to help preserve server resources. If you need higher rate limits, please consider self-hosting.
 
