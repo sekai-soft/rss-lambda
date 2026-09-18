@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - "README.md"
+      - ".gitignore"
+      - "test-rss.xml"
   pull_request:
     branches:
       - master
@@ -123,10 +127,16 @@ jobs:
           docker buildx imagetools create -t ghcr.io/${{ github.repository }}:${{ github.sha }} \
             ghcr.io/${{ github.repository }}:${{ github.sha }}-amd64 \
             ghcr.io/${{ github.repository }}:${{ github.sha }}-arm64
+
   deploy:
     runs-on: ubuntu-latest
     needs: merge
     if: github.event_name == 'push'
+    env:
+      HOSTNAME: eichenwalde
+      USERNAME: ubuntu
+      DIR: /home/ubuntu
+      APP: rss-lambda
     steps:
       - name: Setup Tailscale
         id: tailscale
@@ -135,11 +145,18 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
           tags: tag:ops
-      - name: Pull and restart container
+      - name: Download compose.example.yml from host
         run: |
-          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@eichenwalde" \
-            "mkdir -p /home/ubuntu/rss-lambda && \
-             curl -sSfLo /home/ubuntu/rss-lambda/compose.yaml https://raw.githubusercontent.com/sekai-soft/rss-lambda/${{ github.sha }}/compose.production.yaml && \
-             sed -i 's|ghcr.io/sekai-soft/rss-lambda:latest|ghcr.io/sekai-soft/rss-lambda:${{ github.sha }}|g' /home/ubuntu/rss-lambda/compose.yaml && \
-             docker compose -f /home/ubuntu/rss-lambda/compose.yaml pull rss-lambda && \
-             docker compose -f /home/ubuntu/rss-lambda/compose.yaml up -d --remove-orphans"
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            "$USERNAME@$HOSTNAME:$DIR/$APP/compose.example.yml" compose.example.yml
+      - name: Upload compose.yml and VERSION.txt to host
+        run: |
+          sed 's|{VERSION}|${{ github.sha }}|g' compose.example.yml > compose.yml
+          printf '%s' '${{ github.sha }}' > VERSION.txt
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            compose.yml VERSION.txt "$USERNAME@$HOSTNAME:$DIR/$APP/"
+      - name: Pull and restart containers
+        run: |
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$USERNAME@$HOSTNAME" \
+            "docker compose -f $DIR/$APP/compose.yml pull $APP && \
+             docker compose -f $DIR/$APP/compose.yml up -d --remove-orphans"
